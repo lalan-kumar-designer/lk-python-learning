@@ -1,0 +1,1995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2418305_PYTHON_CODE_BOOK_A4</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-white: #FFFFFF;
+            --text-main: #1E1E1E;
+            --kw-blue: #0070F3;
+            --fn-purple: #8B5CF6;
+            --str-green: #008F11;
+            --cmt-gray: #6B7280;
+            --term-green: #00A651;
+            --matrix-green: #008F11;
+            --cyber-blue: #0070F3;
+            --neon-purple: #8B5CF6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        html, body {
+            background-color: #FFFFFF;
+            color: var(--text-main);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            line-height: 1.42;
+            width: 100%;
+        }
+
+        /* Floating Print Action Bar (Hidden in Print) */
+        #action-bar {
+            position: fixed;
+            top: 12px;
+            right: 16px;
+            z-index: 9999;
+            display: flex;
+            gap: 8px;
+            background: #FFFFFF;
+            border: 1.5px solid var(--cyber-blue);
+            padding: 6px 12px;
+            box-shadow: 0 4px 14px rgba(0, 112, 243, 0.12);
+        }
+
+        .action-btn {
+            background: #FFFFFF;
+            color: var(--cyber-blue);
+            border: 1px solid var(--cyber-blue);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .action-btn:hover {
+            background: var(--cyber-blue);
+            color: #FFFFFF;
+        }
+
+        .badge-stat {
+            color: var(--term-green);
+            font-weight: 700;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            padding-right: 6px;
+        }
+
+        /* A4 Page Architecture */
+        #book-root {
+            width: 210mm;
+            margin: 0 auto;
+            background: #FFFFFF;
+        }
+
+        .a4-page {
+            width: 210mm;
+            height: 297mm;
+            background-color: #FFFFFF;
+            padding: 11mm 13mm 11mm 13mm;
+            page-break-after: always;
+            break-after: page;
+            page-break-inside: avoid;
+            break-inside: avoid;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-bottom: 1px dashed #E5E7EB;
+        }
+
+        .page-header {
+            border-bottom: 1.5px solid var(--cyber-blue);
+            padding-bottom: 4px;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .code-sheet {
+            flex: 1;
+            width: 100%;
+            background: #FFFFFF;
+            overflow: hidden;
+        }
+
+        .code-line {
+            display: flex;
+            white-space: pre;
+            font-size: 10.6px;
+            line-height: 1.38;
+        }
+
+        .ln {
+            width: 34px;
+            min-width: 34px;
+            color: var(--cmt-gray);
+            user-select: none;
+            text-align: right;
+            padding-right: 10px;
+            opacity: 0.65;
+            font-size: 9.5px;
+        }
+
+        .lc {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .page-footer {
+            border-top: 1px solid #E5E7EB;
+            padding-top: 4px;
+            margin-top: 6px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 9.5px;
+            color: var(--cmt-gray);
+        }
+
+        /* Syntax Highlighting Classes */
+        .kw { color: var(--kw-blue); font-weight: 600; }
+        .fn { color: var(--fn-purple); font-weight: 500; }
+        .st { color: var(--str-green); }
+        .cm { color: var(--cmt-gray); font-style: italic; }
+        .tm { color: var(--term-green); font-weight: 600; }
+        .tx { color: var(--text-main); }
+
+        @page {
+            size: A4 portrait;
+            margin: 0mm;
+        }
+
+        @media print {
+            #action-bar {
+                display: none !important;
+            }
+            html, body {
+                width: 210mm;
+                background: #FFFFFF !important;
+            }
+            #book-root {
+                width: 210mm;
+                margin: 0;
+            }
+            .a4-page {
+                border-bottom: none;
+                width: 210mm;
+                height: 297mm;
+                page-break-after: always;
+                break-after: page;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="action-bar">
+        <span class="badge-stat" id="page-counter">PAGES: 36+ A4</span>
+        <button class="action-btn" onclick="window.print()">PRINT / SAVE PDF (A4)</button>
+    </div>
+
+    <div id="book-root"></div>
+
+    <!-- RAW PYTHON CODE CORPUS: SBTE BIHAR 2418305 (220+ #WAP PROGRAMS ACROSS UNITS 1 TO 6) -->
+    <script id="python-corpus" type="text/plain">
+# ==============================================================================
+# UNIT 1.0: FUNDAMENTALS OF PYTHON PROGRAMMING SYNTAX
+# ==============================================================================
+
+#WAP Display Print Hello World?
+print("Hello World")
+
+#WAP Display Student Name Roll Number and Branch?
+print("Name: Lalan Kumar")
+print("Roll No: 101")
+print("Branch: Electrical Engineering")
+print("Board: SBTE Bihar")
+
+#WAP Show Display in Comment and type of comment?
+print("Lalan Kumar")
+#this is a single line comment
+'''This is a Example of
+Python Comment
+This is the multiline comment'''
+
+#WAP Demonstrate Inline Comment and Double Quote Multiline Comment?
+a = 100  # Inline comment storing value 100 in variable a
+b = 200  # Inline comment storing value 200 in variable b
+"""This is another example
+of multiline docstring comment
+in Python programming"""
+print("Sum of a and b:", a + b)
+
+#WAP Show Python Character Set Letters Digits and Special Symbols?
+letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+digits = "0123456789"
+special_symbols = "+-*/%=<>!&|^~()[]{}:;,."
+print("Alphabets:", letters)
+print("Digits:", digits)
+print("Special Symbols:", special_symbols)
+
+#WAP Demonstrate Python Escape Sequence Characters White Spaces?
+print("First Line\nSecond Line")
+print("Column1\tColumn2\tColumn3")
+print("Single Quote: \'Python\' and Double Quote: \"Python\"")
+print("File Path: C:\\Users\\SBTE\\Python")
+
+#WAP Display All Python Keywords Token Using Keyword Module?
+import keyword
+print("List of Python Keywords:")
+print(keyword.kwlist)
+print("Total Number of Keywords:", len(keyword.kwlist))
+
+#WAP Show Valid Identifiers and Case Sensitivity in Python?
+student_name = "Lalan Kumar"
+Student_Name = "Rohan Kumar"
+STUDENT_NAME = "Aman Kumar"
+_subject_code = 2418305
+marks_1 = 95
+print(student_name)
+print(Student_Name)
+print(STUDENT_NAME)
+print("Subject Code:", _subject_code, "Marks:", marks_1)
+
+#WAP Demonstrate String Numeric Boolean and Special None Literals?
+str_literal = "SBTE Bihar Patna"
+int_literal = 2418305
+float_literal = 98.75
+bool_literal = True
+none_literal = None
+print("String Literal:", str_literal)
+print("Integer Literal:", int_literal)
+print("Float Literal:", float_literal)
+print("Boolean Literal:", bool_literal)
+print("Special Literal:", none_literal)
+
+#WAP Create Variables and Display Values with Data Types?
+roll_no = 25
+student_name = "Lalan Kumar"
+percentage = 86.5
+is_pass = True
+print(roll_no, type(roll_no))
+print(student_name, type(student_name))
+print(percentage, type(percentage))
+print(is_pass, type(is_pass))
+
+#WAP Demonstrate Dynamic Typing in Python Variables?
+x = 500
+print("Value of x:", x, "Type:", type(x))
+x = 75.25
+print("Value of x:", x, "Type:", type(x))
+x = "Python Programming"
+print("Value of x:", x, "Type:", type(x))
+
+#WAP Assign Single Value to Multiple Variables and Multiple Values to Multiple Variables?
+p = q = r = 100
+print("Chained Assignment:", p, q, r)
+a, b, c = 10, 20.5, "SBTE"
+print("Multiple Assignment:", a, b, c)
+
+#WAP Demonstrate Concept of Lvalue and Rvalue with Memory Address id()?
+x = 25
+y = 50
+z = x + y
+# Here x, y, z on Left Side are Lvalue (Memory Location)
+# Here 25, 50, (x + y) on Right Side are Rvalue (Data Value)
+print("Rvalue of x:", x, "Lvalue Memory Address id(x):", id(x))
+print("Rvalue of y:", y, "Lvalue Memory Address id(y):", id(y))
+print("Rvalue of z:", z, "Lvalue Memory Address id(z):", id(z))
+
+#WAP Show Integer Number Data Type in Decimal Binary Octal and Hexadecimal Form?
+dec_num = 100
+bin_num = 0b1100100
+oct_num = 0o144
+hex_num = 0x64
+print("Decimal Integer:", dec_num, type(dec_num))
+print("Binary Integer (0b1100100):", bin_num)
+print("Octal Integer (0o144):", oct_num)
+print("Hexadecimal Integer (0x64):", hex_num)
+
+#WAP Show Floating Point Number Data Type and Exponential Scientific Notation?
+price = 145.75
+pi_val = 3.14159
+speed_of_light = 3.0e8
+charge_of_electron = 1.6e-19
+print("Float Price:", price, type(price))
+print("Pi Value:", pi_val)
+print("Exponential 3.0e8:", speed_of_light)
+print("Exponential 1.6e-19:", charge_of_electron)
+
+#WAP Show Complex Number Data Type Real Part Imaginary Part and Conjugate?
+c1 = 4 + 5j
+c2 = 2 - 3j
+print("Complex Number c1:", c1, type(c1))
+print("Real Part of c1:", c1.real)
+print("Imaginary Part of c1:", c1.imag)
+print("Conjugate of c1:", c1.conjugate())
+print("Addition of c1 and c2:", c1 + c2)
+print("Multiplication of c1 and c2:", c1 * c2)
+
+#WAP Demonstrate Boolean Data Type True and False?
+a = 20
+b = 10
+res1 = a > b
+res2 = a < b
+print("Result 1 (20 > 10):", res1, type(res1))
+print("Result 2 (20 < 10):", res2, type(res2))
+print("Integer value of True:", int(True))
+print("Integer value of False:", int(False))
+
+#WAP Demonstrate Sequence Data Types String List and Tuple Overview?
+my_string = "Welcome to Python"
+my_list = [10, 20, 30, 40, 50]
+my_tuple = (100, 200, 300, 400)
+print("Sequence String:", my_string, type(my_string))
+print("Sequence List:", my_list, type(my_list))
+print("Sequence Tuple:", my_tuple, type(my_tuple))
+
+#WAP Demonstrate None Type Data Type in Python?
+val = None
+print("Value:", val)
+print("Data Type of None:", type(val))
+print("Check if val is None:", val is None)
+
+#WAP Demonstrate Mapping Data Type Dictionary Overview?
+student_dict = {"name": "Lalan Kumar", "roll": 101, "course": "Diploma EE", "code": 2418305}
+print("Dictionary Data:", student_dict)
+print("Type of Dictionary:", type(student_dict))
+print("Student Name:", student_dict["name"])
+print("Subject Code:", student_dict["code"])
+
+#WAP Show Distinction Between Immutable Data Types (int, str, tuple) Using id()?
+num = 10
+print("Before change num:", num, "Memory ID:", id(num))
+num = 20
+print("After change num:", num, "Memory ID:", id(num))
+text = "Hello"
+print("Before change text:", text, "Memory ID:", id(text))
+text = text + " World"
+print("After change text:", text, "Memory ID:", id(text))
+
+#WAP Show Distinction Between Mutable Data Types (list, dict, set) Using id()?
+my_list = [10, 20, 30]
+print("Before change list:", my_list, "Memory ID:", id(my_list))
+my_list[0] = 99
+my_list.append(40)
+print("After change list:", my_list, "Memory ID:", id(my_list))
+my_dict = {"a": 1, "b": 2}
+print("Before change dict:", my_dict, "Memory ID:", id(my_dict))
+my_dict["a"] = 100
+print("After change dict:", my_dict, "Memory ID:", id(my_dict))
+
+#WAP Perform All Arithmetic Operators (+, -, *, /, //, %, **) in Python?
+a = 17
+b = 5
+print("a =", a, "b =", b)
+print("Addition (a + b):", a + b)
+print("Subtraction (a - b):", a - b)
+print("Multiplication (a * b):", a * b)
+print("Division (a / b):", a / b)
+print("Floor Division (a // b):", a // b)
+print("Modulus Remainder (a % b):", a % b)
+print("Exponent Power (a ** b):", a ** b)
+
+#WAP Perform All Relational Comparison Operators (==, !=, >, <, >=, <=)?
+x = 25
+y = 15
+print("x =", x, "y =", y)
+print("x == y (Equal to):", x == y)
+print("x != y (Not Equal to):", x != y)
+print("x > y  (Greater than):", x > y)
+print("x < y  (Less than):", x < y)
+print("x >= y (Greater than or Equal to):", x >= y)
+print("x <= y (Less than or Equal to):", x <= y)
+
+#WAP Perform All Logical Operators (and, or, not) in Python?
+a = 10
+b = 20
+c = 30
+print("Logical AND (a < b and b < c):", a < b and b < c)
+print("Logical AND (a < b and b > c):", a < b and b > c)
+print("Logical OR  (a < b or b > c):", a < b or b > c)
+print("Logical OR  (a > b or b > c):", a > b or b > c)
+print("Logical NOT (not (a > b)):", not (a > b))
+
+#WAP Demonstrate Assignment (=) and Augmented Assignment Operators (+=, -=, *=, /=, //=, %=, **=)?
+n = 10
+print("Initial Assignment (=):", n)
+n += 5
+print("Add AND (+= 5):", n)
+n -= 3
+print("Subtract AND (-= 3):", n)
+n *= 4
+print("Multiply AND (*= 4):", n)
+n /= 2
+print("Divide AND (/= 2):", n)
+n //= 3
+print("Floor Divide AND (//= 3):", n)
+n **= 2
+print("Exponent AND (**= 2):", n)
+n %= 7
+print("Modulus AND (%= 7):", n)
+
+#WAP Perform Bitwise Operators (&, |, ^, ~, <<, >>) in Python?
+a = 10  # Binary: 1010
+b = 4   # Binary: 0100
+print("Bitwise AND (a & b):", a & b)
+print("Bitwise OR  (a | b):", a | b)
+print("Bitwise XOR (a ^ b):", a ^ b)
+print("Bitwise NOT (~a):", ~a)
+print("Bitwise Left Shift (a << 2):", a << 2)
+print("Bitwise Right Shift (a >> 1):", a >> 1)
+
+#WAP Demonstrate Identity Operators (is, is not) in Python?
+x = 100
+y = 100
+list1 = [1, 2, 3]
+list2 = [1, 2, 3]
+print("x is y:", x is y)
+print("list1 is list2:", list1 is list2)
+print("list1 is not list2:", list1 is not list2)
+print("list1 == list2 (Value equality):", list1 == list2)
+
+#WAP Demonstrate Membership Operators (in, not in) in Python?
+course = "Python Programming"
+numbers = [10, 20, 30, 40, 50]
+print("'Python' in course:", "Python" in course)
+print("'Java' not in course:", "Java" not in course)
+print("30 in numbers:", 30 in numbers)
+print("99 in numbers:", 99 in numbers)
+
+#WAP Show Difference Between Expressions and Statements in Python?
+# Expression: Combination of values, variables and operators that evaluates to a value
+# Statement: Complete instruction that Python interpreter can execute
+x = 15                     # Assignment Statement
+y = 10                     # Assignment Statement
+result = (x * 2) + (y * 3) # (x * 2) + (y * 3) is an Expression; whole line is a Statement
+print("Evaluated Expression Result:", result) # Print Statement
+
+#WAP Demonstrate Implicit Type Conversion (Automatic Type Promotion)?
+num_int = 125
+num_flt = 12.50
+sum_num = num_int + num_flt
+print("Type of num_int:", type(num_int))
+print("Type of num_flt:", type(num_flt))
+print("Value of sum_num:", sum_num)
+print("Implicitly Converted Type of sum_num:", type(sum_num))
+
+#WAP Demonstrate Explicit Type Conversion (Type Casting int, float, str, list, tuple)?
+s = "250"
+n_int = int(s)
+n_flt = float(s)
+num = 99
+s_num = str(num)
+my_tuple = (1, 2, 3)
+my_list = list(my_tuple)
+print("String to Integer:", n_int, type(n_int))
+print("String to Float:", n_flt, type(n_flt))
+print("Integer to String:", s_num, type(s_num))
+print("Tuple to List:", my_list, type(my_list))
+
+#WAP Demonstrate Input and Output Mechanisms Using print() sep end and Formatting?
+name = "Lalan Kumar"
+roll = 101
+marks = 92.456
+print("Welcome", "to", "SBTE", "Bihar", sep=" - ")
+print("Hello", end=" ")
+print("World!")
+print(f"Student: {name}, Roll: {roll}, Marks: {marks:.2f}")
+print("Student: {}, Roll: {}, Marks: {:.2f}".format(name, roll, marks))
+
+#WAP Show Operator Precedence and Associativity Expression Evaluation?
+# PEMDAS Rule: Parentheses -> Exponent -> Multiply/Divide -> Add/Subtract
+exp1 = 10 + 20 * 3
+exp2 = (10 + 20) * 3
+exp3 = 2 ** 3 ** 2      # Right-to-Left associativity: 2 ** (3 ** 2) = 2 ** 9 = 512
+exp4 = (2 ** 3) ** 2    # Parentheses first: 8 ** 2 = 64
+exp5 = 100 / 10 * 2     # Left-to-Right associativity: (100 / 10) * 2 = 20.0
+print("10 + 20 * 3 =", exp1)
+print("(10 + 20) * 3 =", exp2)
+print("2 ** 3 ** 2 =", exp3)
+print("(2 ** 3) ** 2 =", exp4)
+print("100 / 10 * 2 =", exp5)
+
+#WAP Calculate Simple Interest and Total Amount?
+principal = 5000
+rate = 8.5
+time = 3
+simple_interest = (principal * rate * time) / 100
+total_amount = principal + simple_interest
+print("Principal Amount:", principal)
+print("Rate of Interest:", rate)
+print("Time (in Years):", time)
+print("Simple Interest:", simple_interest)
+print("Total Amount:", total_amount)
+
+#WAP Calculate Area and Circumference of a Circle?
+radius = 7.0
+pi = 3.14159
+area = pi * radius * radius
+circumference = 2 * pi * radius
+print("Radius of Circle:", radius)
+print("Area of Circle:", round(area, 2))
+print("Circumference of Circle:", round(circumference, 2))
+
+#WAP Convert Temperature from Celsius to Fahrenheit and Fahrenheit to Celsius?
+celsius = 37.0
+fahrenheit = (celsius * 9 / 5) + 32
+print(celsius, "Degree Celsius =", fahrenheit, "Degree Fahrenheit")
+f_temp = 98.6
+c_temp = (f_temp - 32) * 5 / 9
+print(f_temp, "Degree Fahrenheit =", c_temp, "Degree Celsius")
+
+#WAP LAB 1(b): Calculate the Area of a Triangle where its Three Sides a, b, c are Given?
+a = 5.0
+b = 6.0
+c = 7.0
+s = (a + b + c) / 2
+area = (s * (s - a) * (s - b) * (s - c)) ** 0.5
+print("Side a:", a, "Side b:", b, "Side c:", c)
+print("Semi-Perimeter (s):", s)
+print("Area of Triangle:", round(area, 2))
+
+#WAP LAB 1(c): Swap Two Variables Using Third Temporary Variable?
+a = 10
+b = 20
+print("Before Swapping: a =", a, "b =", b)
+temp = a
+a = b
+b = temp
+print("After Swapping:  a =", a, "b =", b)
+
+#WAP LAB 1(c): Swap Two Variables Without Using Third Variable?
+a = 50
+b = 100
+print("Before Swapping: a =", a, "b =", b)
+a, b = b, a
+print("After Swapping (Tuple Unpacking): a =", a, "b =", b)
+x = 15
+y = 25
+x = x + y
+y = x - y
+x = x - y
+print("After Swapping (Arithmetic + -):  x =", x, "y =", y)
+
+#WAP LAB 1(d): Solve Quadratic Equation ax^2 + bx + c = 0 for Real Numbers?
+import math
+a = 1.0
+b = -5.0
+c = 6.0
+d = (b ** 2) - (4 * a * c)
+print("Quadratic Equation: a =", a, "b =", b, "c =", c)
+print("Discriminant (d):", d)
+root1 = (-b + math.sqrt(d)) / (2 * a)
+root2 = (-b - math.sqrt(d)) / (2 * a)
+print("Root 1:", root1)
+print("Root 2:", root2)
+
+# ==============================================================================
+# UNIT 2.0: CONDITIONAL AND ITERATIVE STATEMENTS
+# ==============================================================================
+
+#WAP Demonstrate Simple if Statement to Check Voting Eligibility?
+age = 20
+if age >= 18:
+    print("Age is:", age)
+    print("You are Eligible to Vote!")
+print("Program Execution Completed.")
+
+#WAP Demonstrate Simple if Statement to Check Passing Marks?
+marks = 65
+if marks >= 40:
+    print("Marks Obtained:", marks)
+    print("Congratulations! You Passed the Examination.")
+
+#WAP Demonstrate if-else Statement to Check Whether a Number is Even or Odd?
+num = 28
+if num % 2 == 0:
+    print(num, "is an EVEN Number.")
+else:
+    print(num, "is an ODD Number.")
+
+#WAP Demonstrate if-else Statement to Find Greater Between Two Numbers?
+a = 45
+b = 72
+if a > b:
+    print(a, "is greater than", b)
+else:
+    print(b, "is greater than", a)
+
+#WAP Demonstrate if-else Statement to Check Divisibility by 5 and 11?
+num = 55
+if num % 5 == 0 and num % 11 == 0:
+    print(num, "is divisible by both 5 and 11.")
+else:
+    print(num, "is NOT divisible by both 5 and 11.")
+
+#WAP LAB 2(a): Check if a Number is Positive, Negative or Zero Using if-elif-else?
+num = -15
+if num > 0:
+    print(num, "is a POSITIVE Number.")
+elif num < 0:
+    print(num, "is a NEGATIVE Number.")
+else:
+    print(num, "is ZERO.")
+
+#WAP Demonstrate if-elif-else Statement to Display Student Grade Based on Marks?
+marks = 84
+if marks >= 90:
+    print("Marks:", marks, "-> Grade: A+ (Outstanding)")
+elif marks >= 80:
+    print("Marks:", marks, "-> Grade: A (Excellent)")
+elif marks >= 70:
+    print("Marks:", marks, "-> Grade: B (Very Good)")
+elif marks >= 60:
+    print("Marks:", marks, "-> Grade: C (Good)")
+elif marks >= 40:
+    print("Marks:", marks, "-> Grade: D (Pass)")
+else:
+    print("Marks:", marks, "-> Grade: F (Fail)")
+
+#WAP Display Day Name of the Week Using if-elif-else Ladder?
+day_no = 3
+if day_no == 1:
+    print("Monday")
+elif day_no == 2:
+    print("Tuesday")
+elif day_no == 3:
+    print("Wednesday")
+elif day_no == 4:
+    print("Thursday")
+elif day_no == 5:
+    print("Friday")
+elif day_no == 6:
+    print("Saturday")
+elif day_no == 7:
+    print("Sunday")
+else:
+    print("Invalid Day Number!")
+
+#WAP Calculate Electricity Bill Based on Units Consumed Using if-elif-else?
+units = 250
+if units <= 100:
+    bill = units * 4.0
+elif units <= 200:
+    bill = (100 * 4.0) + ((units - 100) * 6.0)
+else:
+    bill = (100 * 4.0) + (100 * 6.0) + ((units - 200) * 8.0)
+print("Total Electricity Units:", units)
+print("Total Bill Amount: Rs.", bill)
+
+#WAP Find Largest Among Three Numbers Using Nested if-else Statement?
+a = 40
+b = 95
+c = 70
+if a >= b:
+    if a >= c:
+        print(a, "is the Largest Number.")
+    else:
+        print(c, "is the Largest Number.")
+else:
+    if b >= c:
+        print(b, "is the Largest Number.")
+    else:
+        print(c, "is the Largest Number.")
+
+#WAP LAB 2(b): Check Whether the Given Year is a Leap Year?
+year = 2024
+if (year % 400 == 0) or (year % 4 == 0 and year % 100 != 0):
+    print(year, "is a LEAP YEAR.")
+else:
+    print(year, "is NOT a Leap Year.")
+
+#WAP Print Numbers from 1 to 10 Using while Loop?
+i = 1
+while i <= 10:
+    print(i, end=" ")
+    i = i + 1
+print()
+
+#WAP Calculate Sum of First N Natural Numbers Using while Loop?
+n = 10
+i = 1
+total_sum = 0
+while i <= n:
+    total_sum = total_sum + i
+    i = i + 1
+print("Sum of first", n, "natural numbers is:", total_sum)
+
+#WAP Find Sum of Digits of a Given Number Using while Loop?
+num = 4567
+temp = num
+digit_sum = 0
+while temp > 0:
+    rem = temp % 10
+    digit_sum = digit_sum + rem
+    temp = temp // 10
+print("Given Number:", num)
+print("Sum of Digits:", digit_sum)
+
+#WAP Reverse a Given Integer Number Using while Loop?
+num = 12345
+temp = num
+rev = 0
+while temp > 0:
+    rem = temp % 10
+    rev = (rev * 10) + rem
+    temp = temp // 10
+print("Original Number:", num)
+print("Reversed Number:", rev)
+
+#WAP Check Whether a Given Integer Number is Palindrome Using while Loop?
+num = 121
+temp = num
+rev = 0
+while temp > 0:
+    rem = temp % 10
+    rev = (rev * 10) + rem
+    temp = temp // 10
+if num == rev:
+    print(num, "is a PALINDROME Number.")
+else:
+    print(num, "is NOT a Palindrome Number.")
+
+#WAP Check Whether a Given Number is an Armstrong Number Using while Loop?
+num = 153
+temp = num
+sum_cubes = 0
+while temp > 0:
+    digit = temp % 10
+    sum_cubes = sum_cubes + (digit ** 3)
+    temp = temp // 10
+if num == sum_cubes:
+    print(num, "is an ARMSTRONG Number.")
+else:
+    print(num, "is NOT an Armstrong Number.")
+
+#WAP Demonstrate range() Function with Stop, Start-Stop, and Start-Stop-Step?
+print("range(6):", list(range(6)))
+print("range(1, 10):", list(range(1, 10)))
+print("range(2, 21, 2):", list(range(2, 21, 2)))
+print("range(10, 0, -1):", list(range(10, 0, -1)))
+
+#WAP Print Even Numbers from 2 to 20 Using for Loop and range()?
+print("Even Numbers from 2 to 20:")
+for i in range(2, 21, 2):
+    print(i, end=" ")
+print()
+
+#WAP Calculate Sum of Odd Numbers from 1 to 20 Using for Loop?
+odd_sum = 0
+for i in range(1, 21, 2):
+    odd_sum = odd_sum + i
+print("Sum of Odd Numbers from 1 to 20:", odd_sum)
+
+#WAP Check Whether a Single Number is Prime or Not Using for Loop?
+num = 29
+is_prime = True
+if num <= 1:
+    is_prime = False
+else:
+    for i in range(2, num):
+        if num % i == 0:
+            is_prime = False
+            break
+if is_prime:
+    print(num, "is a PRIME Number.")
+else:
+    print(num, "is NOT a Prime Number.")
+
+#WAP LAB 2(c): Print All Prime Numbers in an Interval (Between 10 and 50)?
+lower = 10
+upper = 50
+print("Prime Numbers between", lower, "and", upper, "are:")
+for num in range(lower, upper + 1):
+    if num > 1:
+        for i in range(2, num):
+            if num % i == 0:
+                break
+        else:
+            print(num, end=" ")
+print()
+
+#WAP LAB 2(d): Display the Multiplication Table Based on the Given Input?
+num = 7
+print("Multiplication Table of", num)
+for i in range(1, 11):
+    print(num, "x", i, "=", num * i)
+
+#WAP LAB 2(e): Print the Fibonacci Sequence Up to N Terms?
+n_terms = 10
+a = 0
+b = 1
+print("Fibonacci Sequence up to", n_terms, "terms:")
+for i in range(n_terms):
+    print(a, end=" ")
+    c = a + b
+    a = b
+    b = c
+print()
+
+#WAP LAB 2(f): Find the Factorial of a Given Number Using for Loop?
+num = 5
+fact = 1
+if num < 0:
+    print("Factorial does not exist for negative numbers.")
+elif num == 0:
+    print("The Factorial of 0 is 1.")
+else:
+    for i in range(1, num + 1):
+        fact = fact * i
+    print("The Factorial of", num, "is:", fact)
+
+#WAP Demonstrate break Statement Inside a Loop?
+for i in range(1, 11):
+    if i == 6:
+        print("Breaking the loop at i =", i)
+        break
+    print("Value of i:", i)
+
+#WAP Demonstrate continue Statement Inside a Loop?
+for i in range(1, 8):
+    if i == 4:
+        print("Skipping i = 4 using continue")
+        continue
+    print("Value of i:", i)
+
+#WAP Demonstrate pass Statement Inside a Loop?
+for i in range(1, 6):
+    if i == 3:
+        pass  # Null operation placeholder
+    print("Number:", i)
+
+#WAP Print Right-Angled Star (*) Triangle Pattern Using Nested Loops?
+rows = 5
+for i in range(1, rows + 1):
+    for j in range(1, i + 1):
+        print("*", end=" ")
+    print()
+
+#WAP Print Number Triangle Pattern (1, 1 2, 1 2 3...) Using Nested Loops?
+rows = 5
+for i in range(1, rows + 1):
+    for j in range(1, i + 1):
+        print(j, end=" ")
+    print()
+
+#WAP Print Inverted Star (*) Pattern Using Nested Loops?
+rows = 5
+for i in range(rows, 0, -1):
+    for j in range(1, i + 1):
+        print("*", end=" ")
+    print()
+
+#WAP Print Pyramid Star (*) Pattern Using Nested Loops?
+rows = 5
+for i in range(1, rows + 1):
+    print(" " * (rows - i) + "* " * i)
+
+# ==============================================================================
+# UNIT 3.0: STRING, LIST, TUPLES, SET AND DICTIONARY
+# ==============================================================================
+
+#WAP Create a String and Demonstrate Positive and Negative Indexing?
+s = "PYTHON"
+print("Complete String:", s)
+print("Positive Indexing -> s[0]:", s[0], "s[1]:", s[1], "s[5]:", s[5])
+print("Negative Indexing -> s[-1]:", s[-1], "s[-2]:", s[-2], "s[-6]:", s[-6])
+
+#WAP Perform String Operations: Concatenation (+), Repetition (*), and Membership (in, not in)?
+s1 = "Hello"
+s2 = "Python"
+print("Concatenation (s1 + ' ' + s2):", s1 + " " + s2)
+print("Repetition (s1 * 3):", s1 * 3)
+print("Membership ('Py' in s2):", "Py" in s2)
+print("Membership ('z' not in s1):", "z" not in s1)
+
+#WAP Perform String Slicing Operations [start : stop : step]?
+text = "PROGRAMMING"
+print("Original String:", text)
+print("text[0:7]   :", text[0:7])
+print("text[3:8]   :", text[3:8])
+print("text[:4]    :", text[:4])
+print("text[4:]    :", text[4:])
+print("text[::2]   :", text[::2])
+print("text[::-1]  :", text[::-1])
+
+#WAP Traverse a String Character by Character Using for Loop and while Loop?
+word = "SBTE"
+print("Traversing using for loop:")
+for ch in word:
+    print(ch, end=" ")
+print("\nTraversing using while loop:")
+i = 0
+while i < len(word):
+    print(word[i], end=" ")
+    i = i + 1
+print()
+
+#WAP Demonstrate Built-in String Functions and Case Methods (len, upper, lower, title, capitalize, swapcase)?
+s = "welcome to python programming"
+print("Length len(s):", len(s))
+print("upper()      :", s.upper())
+print("lower()      :", s.lower())
+print("title()      :", s.title())
+print("capitalize() :", s.capitalize())
+print("swapcase()   :", "PyThOn".swapcase())
+
+#WAP Demonstrate Built-in String Methods (count, find, index, replace, strip, split, join)?
+s = "  python is easy and python is fast  "
+clean_s = s.strip()
+print("strip()           :", clean_s)
+print("count('python')   :", clean_s.count("python"))
+print("find('easy')      :", clean_s.find("easy"))
+print("replace()         :", clean_s.replace("easy", "powerful"))
+words = clean_s.split(" ")
+print("split(' ')        :", words)
+print("'-'.join(words)   :", "-".join(words))
+
+#WAP Demonstrate String Checking Methods (isalpha, isdigit, isalnum, isupper, islower, isspace)?
+print("'Python'.isalpha()   :", "Python".isalpha())
+print("'12345'.isdigit()    :", "12345".isdigit())
+print("'Python3'.isalnum()  :", "Python3".isalnum())
+print("'SBTE'.isupper()     :", "SBTE".isupper())
+print("'sbte'.islower()     :", "sbte".islower())
+print("'   '.isspace()      :", "   ".isspace())
+
+#WAP LAB 3(a): Check Whether the Given String is Palindrome?
+s = "madam"
+rev_s = s[::-1]
+print("Original String:", s)
+print("Reversed String:", rev_s)
+if s == rev_s:
+    print(s, "is a PALINDROME String.")
+else:
+    print(s, "is NOT a Palindrome String.")
+
+#WAP LAB 3(b): Reverse Words in a Given String in Python?
+s = "Diploma in Electrical Engineering"
+words = s.split()
+reversed_words = words[::-1]
+result = " ".join(reversed_words)
+print("Original String:", s)
+print("Reversed Words :", result)
+
+#WAP LAB 3(c): Identify in a String the Name, Position and Counting of Vowels?
+s = "Python Programming"
+vowels = "aeiouAEIOU"
+count = 0
+print("Given String:", s)
+for i in range(len(s)):
+    if s[i] in vowels:
+        print("Vowel Name:", s[i], "-> Position (Index):", i)
+        count = count + 1
+print("Total Count of Vowels:", count)
+
+#WAP LAB 3(d): Count the Number of Matching Characters in a Pair of String (Using Set)?
+str1 = "abcdef"
+str2 = "defghi"
+set1 = set(str1)
+set2 = set(str2)
+matching_chars = set1.intersection(set2)
+print("String 1:", str1)
+print("String 2:", str2)
+print("Matching Characters:", matching_chars)
+print("Number of Matching Characters:", len(matching_chars))
+
+#WAP LAB 3(e): Python Program for Removing i-th Character from a String?
+s = "PYTHON"
+i = 2  # Removing character at index 2 ('T')
+new_s = s[:i] + s[i + 1:]
+print("Original String:", s)
+print("String after removing index", i, ":", new_s)
+
+#WAP Create a List and Demonstrate Positive and Negative Indexing in List?
+my_list = [10, 20, 30, 40, 50]
+print("Full List:", my_list)
+print("First Element my_list[0]:", my_list[0])
+print("Third Element my_list[2]:", my_list[2])
+print("Last Element my_list[-1]:", my_list[-1])
+print("Second Last my_list[-2] :", my_list[-2])
+
+#WAP Perform List Operations: Concatenation (+), Repetition (*), Membership (in), and Slicing?
+list1 = [1, 2, 3]
+list2 = [4, 5, 6]
+print("Concatenation (list1 + list2):", list1 + list2)
+print("Repetition (list1 * 3)       :", list1 * 3)
+print("Membership (2 in list1)      :", 2 in list1)
+nums = [10, 20, 30, 40, 50, 60, 70]
+print("Slicing nums[1:5]            :", nums[1:5])
+print("Slicing nums[::-1]           :", nums[::-1])
+
+#WAP Traverse a List Using for Loop and Calculate Sum of All Elements?
+marks = [75, 80, 85, 90, 95]
+total = 0
+print("Traversing List Elements:")
+for m in marks:
+    print(m, end=" ")
+    total = total + m
+print("\nTotal Marks:", total)
+
+#WAP Demonstrate Built-in List Functions (len, max, min, sum, sorted) and Methods (append, insert, extend)?
+nums = [40, 10, 50, 20, 30]
+print("len(nums):", len(nums), "max(nums):", max(nums), "min(nums):", min(nums), "sum(nums):", sum(nums))
+nums.append(60)
+print("After append(60):", nums)
+nums.insert(1, 15)
+print("After insert(1, 15):", nums)
+nums.extend([70, 80])
+print("After extend([70, 80]):", nums)
+
+#WAP Demonstrate List Methods (remove, pop, index, count, sort, reverse, clear)?
+items = [10, 30, 20, 40, 20, 50]
+print("Count of 20:", items.count(20))
+print("Index of 40:", items.index(40))
+items.remove(20)
+print("After remove(20):", items)
+popped = items.pop()
+print("After pop():", items, "Popped Item:", popped)
+items.sort()
+print("After sort():", items)
+items.reverse()
+print("After reverse():", items)
+
+#WAP Perform Linear Search on a List of Numbers?
+arr = [15, 42, 8, 23, 67, 91, 34]
+key = 23
+found = False
+for i in range(len(arr)):
+    if arr[i] == key:
+        print("Element", key, "found at index:", i)
+        found = True
+        break
+if not found:
+    print("Element", key, "not found in the list.")
+
+#WAP Count the Frequency of All Elements in a List?
+my_list = [10, 20, 10, 30, 20, 10, 40, 30]
+freq = {}
+for item in my_list:
+    if item in freq:
+        freq[item] = freq[item] + 1
+    else:
+        freq[item] = 1
+print("Given List:", my_list)
+print("Frequency of Elements:", freq)
+
+#WAP LAB 4(a): Find Largest Number in a Given List Without Using max()?
+nums = [25, 89, 14, 96, 52, 73, 41]
+largest = nums[0]
+for n in nums:
+    if n > largest:
+        largest = n
+print("Given List:", nums)
+print("Largest Number (Without max()):", largest)
+
+#WAP LAB 4(b): Find the Common Numbers from Two Lists?
+list1 = [10, 20, 30, 40, 50]
+list2 = [30, 40, 50, 60, 70]
+common = []
+for item in list1:
+    if item in list2:
+        common.append(item)
+print("List 1:", list1)
+print("List 2:", list2)
+print("Common Numbers:", common)
+
+#WAP LAB 4(c): Create a List of Even Numbers and Another List of Odd Numbers from a Given List?
+numbers = [11, 22, 33, 44, 55, 66, 77, 88, 99, 100]
+even_list = []
+odd_list = []
+for n in numbers:
+    if n % 2 == 0:
+        even_list.append(n)
+    else:
+        odd_list.append(n)
+print("Given List       :", numbers)
+print("Even Numbers List:", even_list)
+print("Odd Numbers List :", odd_list)
+
+#WAP LAB 4(d): Find Number of Occurrences of a Given Number Without Using Built-in Methods?
+nums = [5, 2, 8, 5, 3, 5, 9, 2, 5, 1]
+target = 5
+count = 0
+for n in nums:
+    if n == target:
+        count = count + 1
+print("Given List:", nums)
+print("Occurrences of", target, "(Without count()):", count)
+
+#WAP Create, Initialize, Access Elements, and Perform Tuple Assignment (Unpacking)?
+t1 = ()
+t2 = (100,)
+t3 = (10, 20, 30, 40, 50)
+print("Empty Tuple:", t1, "Single Element Tuple:", t2)
+print("Tuple t3[0]:", t3[0], "t3[-1]:", t3[-1], "Slice t3[1:4]:", t3[1:4])
+a, b, c = (1, 2, 3)
+print("Tuple Assignment Unpacking -> a:", a, "b:", b, "c:", c)
+
+#WAP Perform Operations on Tuples, Tuple Methods (count, index), Built-in Functions, and Nested Tuples?
+tup1 = (10, 20, 30)
+tup2 = (40, 50, 10, 10)
+tup3 = tup1 + tup2
+print("Concatenated Tuple:", tup3)
+print("Repetition tup1 * 2:", tup1 * 2)
+print("count(10):", tup3.count(10), "index(40):", tup3.index(40))
+print("len:", len(tup3), "max:", max(tup3), "min:", min(tup3), "sum:", sum(tup3))
+nested_tup = ((1, "Lalan"), (2, "Rohan"), (3, "Aman"))
+print("Nested Tuple:", nested_tup, "First Nested Element:", nested_tup[0][1])
+
+#WAP LAB 5(a): Find the Index of an Item of a Tuple?
+my_tuple = (10, 20, 30, 40, 50, 60)
+index_pos = my_tuple.index(40)
+print("Tuple:", my_tuple)
+print("Index of item 40 is:", index_pos)
+
+#WAP LAB 5(b): Find the Length of a Tuple?
+my_tuple = ("Apple", "Banana", "Cherry", "Mango", "Orange")
+print("Tuple:", my_tuple)
+print("Length of the Tuple is:", len(my_tuple))
+
+#WAP LAB 5(c): Write a Python Program to Reverse a Tuple?
+my_tuple = (10, 20, 30, 40, 50)
+rev_tuple = my_tuple[::-1]
+print("Original Tuple:", my_tuple)
+print("Reversed Tuple:", rev_tuple)
+
+#WAP LAB 5(d): Sort a List of Tuple by Its Float Element?
+sample_data = [('item1', '12.20'), ('item2', '15.10'), ('item3', '24.5')]
+# Sorting in descending order by converting string float element to float
+n = len(sample_data)
+for i in range(n):
+    for j in range(0, n - i - 1):
+        if float(sample_data[j][1]) < float(sample_data[j + 1][1]):
+            sample_data[j], sample_data[j + 1] = sample_data[j + 1], sample_data[j]
+print("Sorted Output:", sample_data)
+
+#WAP Create a Set, Traverse Set, Add Data, and Remove Data in Set?
+my_set = {10, 20, 30, 20, 40}
+print("Initial Set (Duplicates Removed):", my_set)
+my_set.add(50)
+my_set.update([60, 70])
+print("After add(50) and update([60, 70]):", my_set)
+my_set.remove(20)
+my_set.discard(30)
+print("After remove(20) and discard(30):", my_set)
+print("Traversing Set:")
+for item in my_set:
+    print(item, end=" ")
+print()
+
+#WAP LAB 6(a): Write a Python Program to Create an Intersection of Sets?
+set1 = {10, 20, 30, 40, 50}
+set2 = {30, 40, 50, 60, 70}
+inter_set = set1.intersection(set2)
+print("Set 1:", set1)
+print("Set 2:", set2)
+print("Intersection of Set 1 and Set 2:", inter_set)
+
+#WAP LAB 6(b): Write a Python Program to Create a Union of Sets?
+set1 = {10, 20, 30}
+set2 = {30, 40, 50}
+union_set = set1.union(set2)
+print("Set 1:", set1)
+print("Set 2:", set2)
+print("Union of Set 1 and Set 2:", union_set)
+
+#WAP LAB 6(c): Write a Python Program to Create Set Difference?
+set1 = {10, 20, 30, 40, 50}
+set2 = {40, 50, 60, 70}
+diff_set = set1.difference(set2)
+print("Set 1:", set1)
+print("Set 2:", set2)
+print("Set Difference (Set 1 - Set 2):", diff_set)
+
+#WAP LAB 6(d): Check if Two Given Sets Have No Elements in Common (Disjoint Sets)?
+set1 = {1, 2, 3}
+set2 = {4, 5, 6}
+set3 = {3, 4, 5}
+print("Set 1 and Set 2 have no elements in common:", set1.isdisjoint(set2))
+print("Set 1 and Set 3 have no elements in common:", set1.isdisjoint(set3))
+
+#WAP Access Items in a Dictionary Using Keys and Demonstrate Mutability (Adding & Modifying)?
+student = {"name": "Lalan Kumar", "roll": 101, "branch": "EE"}
+print("Access using key student['name']:", student["name"])
+print("Access using get() method       :", student.get("roll"))
+# Adding a new item
+student["marks"] = 92
+# Modifying an existing item
+student["branch"] = "Electrical Engineering"
+print("Updated Dictionary:", student)
+
+#WAP Demonstrate Built-in Dictionary Functions and Methods (keys, values, items, pop, update, len)?
+d = {"a": 10, "b": 20, "c": 30}
+print("Length len(d):", len(d))
+print("keys()       :", list(d.keys()))
+print("values()     :", list(d.values()))
+print("items()      :", list(d.items()))
+d.pop("b")
+print("After pop('b'):", d)
+
+#WAP LAB 7(a): Write a Python Script to Concatenate Two Dictionaries to Create a New One?
+dic1 = {1: 10, 2: 20}
+dic2 = {3: 30, 4: 40}
+dic3 = {5: 50, 6: 60}
+dic4 = {}
+for d in (dic1, dic2, dic3):
+    dic4.update(d)
+print("Dictionary 1:", dic1)
+print("Dictionary 2:", dic2)
+print("Dictionary 3:", dic3)
+print("Concatenated Dictionary:", dic4)
+
+#WAP LAB 7(b): Write a Python Script to Merge Two Python Dictionaries?
+d1 = {"x": 100, "y": 200}
+d2 = {"z": 300, "w": 400}
+merged_d = d1.copy()
+merged_d.update(d2)
+print("Dictionary 1:", d1)
+print("Dictionary 2:", d2)
+print("Merged Dictionary:", merged_d)
+
+#WAP LAB 7(c): Write a Python Program to Combine Two Dictionary Adding Values for Common Keys?
+d1 = {'a': 100, 'b': 200, 'c': 300}
+d2 = {'a': 300, 'b': 200, 'd': 400}
+d = d1.copy()
+for key, value in d2.items():
+    if key in d:
+        d[key] = d[key] + value
+    else:
+        d[key] = value
+print("d1 =", d1)
+print("d2 =", d2)
+print("Combined Dictionary d =", d)
+
+# ==============================================================================
+# UNIT 4.0: PYTHON FUNCTIONS, MODULES AND PACKAGES
+# ==============================================================================
+
+#WAP Demonstrate Types of Functions: Built-in Functions, Module Functions, and User-Defined Functions?
+import math
+# 1. Built-in Function
+print("Built-in Function max():", max(10, 50, 30))
+# 2. Function Defined in Module
+print("Module Function math.sqrt(64):", math.sqrt(64))
+# 3. User-Defined Function
+def greet_student():
+    print("Hello from User-Defined Function!")
+greet_student()
+
+#WAP Create a User-Defined Function with Arguments and Parameters to Add Two Numbers?
+def add_numbers(a, b):
+    result = a + b
+    print("Sum of", a, "and", b, "is:", result)
+
+add_numbers(25, 35)
+add_numbers(100, 250)
+
+#WAP Demonstrate Function Returning a Single Value and Multiple Values?
+def calculate_rectangle(length, width):
+    area = length * width
+    perimeter = 2 * (length + width)
+    return area, perimeter
+
+rect_area, rect_peri = calculate_rectangle(10, 5)
+print("Area of Rectangle:", rect_area)
+print("Perimeter of Rectangle:", rect_peri)
+
+#WAP Demonstrate Positional Parameters, Default Parameters, and Keyword Arguments?
+def student_info(name, branch="Electrical", semester=3):
+    print("Name:", name, "| Branch:", branch, "| Semester:", semester)
+
+# Positional Arguments
+student_info("Lalan Kumar", "EE", 3)
+# Default Parameters Used
+student_info("Rohan Kumar")
+# Keyword Arguments
+student_info(semester=3, name="Aman Kumar", branch="CSE")
+
+#WAP Demonstrate Anonymous Lambda Function in Python?
+square = lambda x: x * x
+multiply = lambda a, b: a * b
+print("Square of 8 using Lambda:", square(8))
+print("Multiplication of 6 and 7 using Lambda:", multiply(6, 7))
+nums = [1, 2, 3, 4, 5, 6]
+even_nums = list(filter(lambda n: n % 2 == 0, nums))
+squared_nums = list(map(lambda n: n ** 2, nums))
+print("Filtered Evens:", even_nums, "| Mapped Squares:", squared_nums)
+
+#WAP Differentiate Variable Scope: Global Scope vs Local Scope with Example?
+x = 100  # Global Variable
+
+def test_scope():
+    y = 50  # Local Variable
+    print("Inside Function -> Local y:", y)
+    print("Inside Function -> Global x:", x)
+
+test_scope()
+print("Outside Function -> Global x:", x)
+
+#WAP Demonstrate Modifying a Global Variable Inside a Function Using global Keyword?
+count = 10
+
+def increment_counter():
+    global count
+    count = count + 5
+    print("Count Inside Function:", count)
+
+print("Count Before Function Call:", count)
+increment_counter()
+print("Count After Function Call:", count)
+
+#WAP LAB 8(a): Write a Python Function for Reversing a String and Call It?
+def reverse_string(text):
+    return text[::-1]
+
+original = "Python Programming"
+reversed_res = reverse_string(original)
+print("Original String:", original)
+print("Reversed String:", reversed_res)
+
+#WAP LAB 8(b): Write a Python Function for Calculating Compound Interest and Call It?
+def compound_interest(principal, rate, time):
+    amount = principal * ((1 + (rate / 100)) ** time)
+    ci = amount - principal
+    return ci
+
+p = 10000
+r = 10
+t = 2
+ci_result = compound_interest(p, r, t)
+print("Principal:", p, "Rate:", r, "Time:", t)
+print("Compound Interest:", round(ci_result, 2))
+
+#WAP LAB 8(c): Write a Python Function for Calculating the Factorial of a Number and Call It to Calculate !n / (!r * !(n-r))?
+def factorial(num):
+    f = 1
+    for i in range(1, num + 1):
+        f = f * i
+    return f
+
+n = 5
+r = 2
+result = factorial(n) // (factorial(r) * factorial(n - r))
+print("Value of n:", n, "Value of r:", r)
+print("Factorial of n (!n):", factorial(n))
+print("Result of !n / (!r * !(n-r)):", result)
+
+#WAP Import and Use Built-in Python Modules (math, random, datetime) Using import Statement?
+import math
+import random
+import datetime
+print("math.pi:", round(math.pi, 4))
+print("math.pow(2, 5):", math.pow(2, 5))
+print("math.factorial(5):", math.factorial(5))
+print("random.randint(1, 100):", random.randint(10, 50))
+print("Date Today:", datetime.date(2026, 10, 20))
+
+#WAP Demonstrate Regular Expressions Using Python re Module (search, findall, split, sub)?
+import re
+text = "Student Lalan Roll 101 Marks 95 Code 2418305"
+numbers = re.findall(r"\d+", text)
+words = re.split(r"\s+", text)
+replaced = re.sub(r"95", "98", text)
+print("Original Text:", text)
+print("re.findall() Digits:", numbers)
+print("re.split() Words   :", words)
+print("re.sub() Replaced  :", replaced)
+
+#WAP Demonstrate Pip Python Package Manager and PyPI Package Usage Information in Python?
+import sys
+print("Python Version:", sys.version.split()[0])
+# Pip Commands for PyPI (Python Package Index):
+# pip install numpy
+# pip list
+# pip show numpy
+print("Standard Library Modules Loaded Count:", len(sys.modules))
+
+# ==============================================================================
+# UNIT 5.0: NUMPY
+# ==============================================================================
+
+#WAP Create NumPy Arrays Using np.array(), np.zeros(), np.ones(), np.arange(), and np.linspace()?
+import numpy as np
+arr1 = np.array([10, 20, 30, 40, 50])
+arr_zeros = np.zeros(5)
+arr_ones = np.ones((2, 3))
+arr_range = np.arange(1, 11, 2)
+arr_lin = np.linspace(0, 10, 5)
+print("np.array()   :", arr1)
+print("np.zeros(5)  :", arr_zeros)
+print("np.ones(2,3) :\n", arr_ones)
+print("np.arange()  :", arr_range)
+print("np.linspace():", arr_lin)
+
+#WAP Explore NumPy Array Attributes: ndim (Dimensions), shape, size, and dtype?
+import numpy as np
+arr_2d = np.array([[10, 20, 30], [40, 50, 60]])
+print("2D Array:\n", arr_2d)
+print("Number of Dimensions (ndim):", arr_2d.ndim)
+print("Shape of Array (shape)     :", arr_2d.shape)
+print("Total Elements (size)      :", arr_2d.size)
+print("Data Type (dtype)          :", arr_2d.dtype)
+
+#WAP Demonstrate Difference Between One-Dimensional and Multi-Dimensional Array Indexing and Slicing?
+import numpy as np
+arr_1d = np.array([10, 20, 30, 40, 50, 60])
+arr_2d = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+print("1D Element arr_1d[2]    :", arr_1d[2])
+print("1D Slice arr_1d[1:5]    :", arr_1d[1:5])
+print("2D Element arr_2d[1, 2] :", arr_2d[1, 2])
+print("2D First Row arr_2d[0,:] :", arr_2d[0, :])
+print("2D Second Col arr_2d[:,1]:", arr_2d[:, 1])
+print("2D Subarray arr_2d[0:2, 1:3]:\n", arr_2d[0:2, 1:3])
+
+#WAP Perform Element-Wise Arithmetic Operations on NumPy Arrays (+, -, *, /, **)?
+import numpy as np
+a = np.array([10, 20, 30, 40])
+b = np.array([2, 4, 5, 8])
+print("Array a:", a)
+print("Array b:", b)
+print("Element-wise Addition (a + b)      :", a + b)
+print("Element-wise Subtraction (a - b)   :", a - b)
+print("Element-wise Multiplication (a * b):", a * b)
+print("Element-wise Division (a / b)      :", a / b)
+print("Element-wise Square (b ** 2)       :", b ** 2)
+
+#WAP Explore NumPy Universal Functions (ufuncs) for Mathematical Operations?
+import numpy as np
+arr = np.array([1, 4, 9, 16, 25])
+print("Original Array:", arr)
+print("np.sqrt(arr)  :", np.sqrt(arr))
+print("np.exp(arr)   :", np.round(np.exp([1, 2, 3]), 2))
+print("np.sin()      :", np.round(np.sin([0, np.pi / 2, np.pi]), 2))
+print("np.sum(arr)   :", np.sum(arr))
+print("np.mean(arr)  :", np.mean(arr))
+print("np.max(arr)   :", np.max(arr), "np.min(arr):", np.min(arr))
+
+#WAP Solve Linear Algebra Problems with NumPy: Matrix Multiplication, Determinant, Inverse, and Linear Equations?
+import numpy as np
+A = np.array([[2, 1], [1, 3]])
+B = np.array([[1, 2], [3, 4]])
+# 1. Matrix Multiplication
+print("Matrix Multiplication np.dot(A, B):\n", np.dot(A, B))
+# 2. Determinant of Matrix A
+print("Determinant of A:", round(np.linalg.det(A), 2))
+# 3. Inverse of Matrix A
+print("Inverse of A:\n", np.linalg.inv(A))
+# 4. Solving Linear Equations: 2x + y = 8 and x + 3y = 9
+constants = np.array([8, 9])
+solution = np.linalg.solve(A, constants)
+print("Solution of Linear Equations (x, y):", solution)
+
+#WAP Demonstrate File Input and Output with NumPy (np.savetxt, np.loadtxt, np.save, np.load)?
+import numpy as np
+data = np.array([[10, 20, 30], [40, 50, 60]])
+np.savetxt("numpy_data.txt", data, fmt="%d")
+loaded_txt = np.loadtxt("numpy_data.txt", dtype=int)
+print("Loaded from Text File:\n", loaded_txt)
+np.save("numpy_binary.npy", data)
+loaded_npy = np.load("numpy_binary.npy")
+print("Loaded from Binary .npy File:\n", loaded_npy)
+
+#WAP Demonstrate Broadcasting in NumPy Arrays?
+import numpy as np
+matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+scalar = 10
+row_vec = np.array([100, 200, 300])
+print("Original 3x3 Matrix:\n", matrix)
+print("Scalar Broadcasting (matrix + 10):\n", matrix + scalar)
+print("1D Row Broadcasting (matrix + row_vec):\n", matrix + row_vec)
+
+#WAP LAB 9(a): Write a Python Program to Create a NumPy Array Filled With All Zeros?
+import numpy as np
+zeros_1d = np.zeros(6, dtype=int)
+zeros_2d = np.zeros((3, 4), dtype=int)
+print("1D Array of All Zeros:", zeros_1d)
+print("2D Array of All Zeros:\n", zeros_2d)
+
+#WAP LAB 9(b): Write a Python Program to Check Whether a NumPy Array Contains a Specified Row?
+import numpy as np
+arr = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+row1 = [4, 5, 6]
+row2 = [10, 11, 12]
+print("2D Array:\n", arr)
+print("Contains [4, 5, 6]   :", row1 in arr.tolist())
+print("Contains [10, 11, 12]:", row2 in arr.tolist())
+
+#WAP LAB 9(c): Write a Python Program to Remove Rows in NumPy Array That Contains Non-Numeric Values?
+import numpy as np
+arr = np.array([[10.0, 20.0, 30.0], [40.0, np.nan, 60.0], [70.0, 80.0, 90.0]])
+print("Original Array with NaN:\n", arr)
+clean_arr = arr[~np.isnan(arr).any(axis=1)]
+print("Array After Removing Non-Numeric (NaN) Rows:\n", clean_arr)
+
+#WAP LAB 9(d): Write a Python Program to Find the Number of Occurrences of a Sequence in a NumPy Array?
+import numpy as np
+arr = np.array([[2, 8, 9, 4], [9, 4, 9, 4], [4, 5, 9, 7], [2, 9, 4, 3]])
+output = repr(arr).count("9, 4")
+print("NumPy Array:\n", arr)
+print("Occurrences of sequence [9, 4]:", output)
+
+#WAP LAB 9(e): Write a Python Program to Find the Most Frequent Value in a NumPy Array?
+import numpy as np
+x = np.array([1, 2, 3, 1, 2, 1, 1, 1, 3, 2, 2, 1])
+print("Original Array:", x)
+most_frequent = np.bincount(x).argmax()
+print("Most Frequent Value in the Array:", most_frequent)
+
+#WAP LAB 9(f): Write a Python Program to Combine a One and a Two-Dimensional NumPy Array?
+import numpy as np
+num_1d = np.arange(3)
+num_2d = np.arange(6).reshape(2, 3)
+print("1D Array:", num_1d)
+print("2D Array:\n", num_2d)
+combined = np.vstack([num_2d, num_1d])
+print("Combined Array:\n", combined)
+
+#WAP LAB 9(g): Write a Python Program to Flatten a Matrix in Python Using NumPy?
+import numpy as np
+matrix = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+flat_array = matrix.flatten()
+print("Original 2D Matrix:\n", matrix)
+print("Flattened 1D Array:", flat_array)
+
+#WAP LAB 9(h): Write a Python Program to Interchange Two Axes of an Array?
+import numpy as np
+arr = np.array([[1, 2, 3]])
+print("Original Array:\n", arr, "Shape:", arr.shape)
+swapped = np.swapaxes(arr, 0, 1)
+print("After Interchange Two Axes:\n", swapped, "Shape:", swapped.shape)
+
+# ==============================================================================
+# UNIT 6.0: EXCEPTION AND FILE HANDLING IN PYTHON
+# ==============================================================================
+
+#WAP Demonstrate Try - Except - Else - Finally Clause in Exception Handling?
+try:
+    a = 20
+    b = 4
+    res = a / b
+except ZeroDivisionError:
+    print("Error: Cannot divide by Zero!")
+else:
+    print("Division Result (Inside else block):", res)
+finally:
+    print("Finally block always executes!")
+
+#WAP Demonstrate Raising an Exception Using raise Keyword and User-Defined Exception?
+class InvalidAgeError(Exception):
+    pass
+
+try:
+    age = 15
+    if age < 18:
+        raise InvalidAgeError("Age must be 18 or above to register!")
+except InvalidAgeError as e:
+    print("Caught User-Defined Exception:", e)
+
+#WAP LAB 10(a)(i): Handle TypeError Exception Using try...except and try...finally?
+try:
+    result = "SBTE" + 100
+except TypeError as e:
+    print("Caught TypeError:", e)
+finally:
+    print("TypeError handling completed.")
+
+#WAP LAB 10(a)(ii): Handle NameError Exception Using try...except and try...finally?
+try:
+    print(undeclared_variable)
+except NameError as e:
+    print("Caught NameError:", e)
+finally:
+    print("NameError handling completed.")
+
+#WAP LAB 10(a)(iii): Handle IndexError Exception Using try...except and try...finally?
+try:
+    my_list = [10, 20, 30]
+    print(my_list[5])
+except IndexError as e:
+    print("Caught IndexError:", e)
+finally:
+    print("IndexError handling completed.")
+
+#WAP LAB 10(a)(iv): Handle KeyError Exception Using try...except and try...finally?
+try:
+    my_dict = {"name": "Lalan", "roll": 101}
+    print(my_dict["marks"])
+except KeyError as e:
+    print("Caught KeyError: Key", e, "not found in dictionary.")
+finally:
+    print("KeyError handling completed.")
+
+#WAP LAB 10(a)(v): Handle ValueError Exception Using try...except and try...finally?
+try:
+    num = int("Python")
+except ValueError as e:
+    print("Caught ValueError:", e)
+finally:
+    print("ValueError handling completed.")
+
+#WAP LAB 10(a)(vi): Handle IOError (FileNotFoundError) Using try...except and try...finally?
+try:
+    f = open("missing_file_sbte.txt", "r")
+except IOError as e:
+    print("Caught IOError:", e)
+finally:
+    print("IOError handling completed.")
+
+#WAP LAB 10(a)(vii): Handle ZeroDivisionError Exception Using try...except and try...finally?
+try:
+    x = 50 / 0
+except ZeroDivisionError as e:
+    print("Caught ZeroDivisionError:", e)
+finally:
+    print("ZeroDivisionError handling completed.")
+
+#WAP LAB 10(b): Demonstrate Text File Operations: Open, Write ('w'), Append ('a'), Read ('r'), and Close?
+# 1. Writing to a Text File ('w' mode)
+f = open("sbte_notes.txt", "w")
+f.write("Welcome to SBTE Bihar Python Programming.\n")
+f.write("Subject Code: 2418305\n")
+f.close()
+
+# 2. Appending to a Text File ('a' mode)
+f = open("sbte_notes.txt", "a")
+f.write("Student Name: Lalan Kumar\n")
+f.close()
+
+# 3. Reading from a Text File ('r' mode)
+f = open("sbte_notes.txt", "r")
+content = f.read()
+print("File Content:\n" + content.strip())
+f.close()
+
+#WAP Demonstrate Text File Reading Methods: read(), readline(), readlines(), seek(), and tell()?
+f = open("sbte_notes.txt", "r")
+print("First Line using readline():", f.readline().strip())
+print("Current File Pointer Position tell():", f.tell())
+f.seek(0)
+print("All Lines using readlines():", f.readlines())
+f.close()
+
+#WAP Demonstrate Reading and Writing Binary Files ('wb' and 'rb' Modes)?
+# Writing raw bytes to a binary file
+f_bin = open("binary_data.bin", "wb")
+f_bin.write(b"Binary File Data 2418305")
+f_bin.close()
+
+# Reading raw bytes from a binary file
+f_bin = open("binary_data.bin", "rb")
+data = f_bin.read()
+print("Read Binary Data:", data)
+print("Decoded Text    :", data.decode("utf-8"))
+f_bin.close()
+
+#WAP Demonstrate Binary File Object Serialization Using pickle Module (dump and load)?
+import pickle
+student_record = {"name": "Lalan Kumar", "roll": 101, "marks": [88, 92, 95]}
+with open("student.dat", "wb") as bf:
+    pickle.dump(student_record, bf)
+
+with open("student.dat", "rb") as bf:
+    loaded_record = pickle.load(bf)
+print("Loaded Record from Binary File:", loaded_record)
+
+# ==============================================================================
+# SBTE MICRO-PROJECTS (COURSE 2418305)
+# ==============================================================================
+
+#WAP MICRO-PROJECT 1: Create a Shop Billing System?
+items = {"Notebook": 50, "Pen": 10, "Pencil": 5, "Geometry Box": 120}
+cart = {"Notebook": 3, "Pen": 5, "Geometry Box": 1}
+total_bill = 0
+print("------ SHOP BILLING SYSTEM ------")
+for item, qty in cart.items():
+    price = items[item]
+    cost = price * qty
+    total_bill = total_bill + cost
+    print(f"{item:14s} | Qty: {qty} | Rate: {price:3d} | Amount: Rs. {cost}")
+print("---------------------------------")
+print("Total Payable Bill Amount: Rs.", total_bill)
+
+#WAP MICRO-PROJECT 2: Create an Income Tax Calculation System?
+income = 750000
+if income <= 300000:
+    tax = 0
+elif income <= 600000:
+    tax = (income - 300000) * 0.05
+elif income <= 900000:
+    tax = (300000 * 0.05) + ((income - 600000) * 0.10)
+else:
+    tax = (300000 * 0.05) + (300000 * 0.10) + ((income - 900000) * 0.15)
+print("Annual Income : Rs.", income)
+print("Income Tax    : Rs.", tax)
+
+#WAP MICRO-PROJECT 3: Develop Number Guessing Game (Maximum 5 Guesses Allowed)?
+secret_number = 37
+user_guesses = [50, 25, 40, 35, 37]
+max_guesses = 5
+for attempt in range(max_guesses):
+    guess = user_guesses[attempt]
+    print(f"Guess {attempt + 1}: {guess}", end=" -> ")
+    if guess == secret_number:
+        print("Congratulations! You guessed the correct number!")
+        break
+    elif guess < secret_number:
+        print("Too Low!")
+    else:
+        print("Too High!")
+
+#WAP MICRO-PROJECT 4: Assign Numbers to Alphabet a-z as (1-26) and Convert Input Word into a Number by Adding All Individual Alphabets?
+word = "PYTHON"
+total_number = 0
+for ch in word.lower():
+    if 'a' <= ch <= 'z':
+        pos = ord(ch) - ord('a') + 1
+        print(f"Alphabet '{ch.upper()}' = {pos}")
+        total_number = total_number + pos
+print("Input Word:", word, "-> Converted Total Number:", total_number)
+
+#WAP MICRO-PROJECT 5: Design a Basic Calculator Program That Performs Addition, Subtraction, Multiplication, and Division?
+num1 = 40
+num2 = 8
+print("Numbers:", num1, "and", num2)
+print("1. Addition (+)      :", num1 + num2)
+print("2. Subtraction (-)   :", num1 - num2)
+print("3. Multiplication (*):", num1 * num2)
+print("4. Division (/)      :", num1 / num2)
+    </script>
+
+    <!-- JAVASCRIPT A4 PAGE ENGINE & SYNTAX HIGHLIGHTER -->
+    <script>
+        (function () {
+            const KEYWORDS = new Set([
+                "def", "class", "return", "if", "elif", "else", "for", "while",
+                "break", "continue", "pass", "import", "from", "as", "try",
+                "except", "finally", "raise", "with", "yield", "lambda", "in",
+                "not", "and", "or", "is", "None", "True", "False", "global",
+                "nonlocal", "del", "assert"
+            ]);
+
+            const BUILTINS = new Set([
+                "print", "len", "range", "type", "int", "float", "str", "complex",
+                "list", "tuple", "set", "dict", "bool", "bytes", "id", "ord", "chr",
+                "abs", "round", "min", "max", "sum", "sorted", "reversed", "enumerate",
+                "zip", "map", "filter", "open", "super", "isinstance", "any", "all"
+            ]);
+
+            function escapeHtml(str) {
+                return str
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;");
+            }
+
+            function buildA4CodeBook() {
+                const rawCorpus = document.getElementById("python-corpus").textContent.replace(/^\n+|\n+$/g, "");
+                const rawLines = rawCorpus.split("\n");
+
+                // Pre-process lines so each #WAP program has its own 1. 2. 3. line numbers
+                const processedLines = [];
+                let progLineCounter = 1;
+                let inMultilineComment = false;
+
+                for (let i = 0; i < rawLines.length; i++) {
+                    const line = rawLines[i];
+                    const trimmed = line.trim();
+
+                    if (trimmed === "") {
+                        processedLines.push({ ln: "", html: "&nbsp;", unitChange: null });
+                        continue;
+                    }
+
+                    if (trimmed.startsWith("# ===") || trimmed.startsWith("# UNIT") || trimmed.startsWith("# SBTE")) {
+                        let unitTag = null;
+                        if (trimmed.includes("UNIT 1.0:")) unitTag = "UNIT 1.0: FUNDAMENTALS OF PYTHON SYNTAX";
+                        else if (trimmed.includes("UNIT 2.0:")) unitTag = "UNIT 2.0: CONDITIONAL & ITERATIVE STATEMENTS";
+                        else if (trimmed.includes("UNIT 3.0:")) unitTag = "UNIT 3.0: STRING, LIST, TUPLE, SET & DICTIONARY";
+                        else if (trimmed.includes("UNIT 4.0:")) unitTag = "UNIT 4.0: FUNCTIONS, MODULES & PACKAGES";
+                        else if (trimmed.includes("UNIT 5.0:")) unitTag = "UNIT 5.0: NUMPY ARRAYS & LINEAR ALGEBRA";
+                        else if (trimmed.includes("UNIT 6.0:")) unitTag = "UNIT 6.0: EXCEPTION & FILE HANDLING";
+                        else if (trimmed.includes("MICRO-PROJECTS")) unitTag = "SBTE LAB MICRO-PROJECTS (1 TO 5)";
+
+                        processedLines.push({
+                            ln: "",
+                            html: '<span class="tm">' + escapeHtml(line) + '</span>',
+                            unitChange: unitTag
+                        });
+                        continue;
+                    }
+
+                    if (trimmed.startsWith("#WAP")) {
+                        progLineCounter = 1;
+                        inMultilineComment = false;
+                        processedLines.push({
+                            ln: "",
+                            html: '<span class="kw">' + escapeHtml(line) + '</span>',
+                            unitChange: null
+                        });
+                        continue;
+                    }
+
+                    const lineLabel = progLineCounter + ".";
+                    progLineCounter++;
+
+                    // Check multiline ''' or """ comments
+                    if (inMultilineComment) {
+                        processedLines.push({
+                            ln: lineLabel,
+                            html: '<span class="cm">' + escapeHtml(line) + '</span>',
+                            unitChange: null
+                        });
+                        if (trimmed.includes("'''") || trimmed.includes('"""')) {
+                            inMultilineComment = false;
+                        }
+                        continue;
+                    }
+
+                    if (trimmed.startsWith("'''") || trimmed.startsWith('"""')) {
+                        const delim = trimmed.slice(0, 3);
+                        const rest = trimmed.slice(3);
+                        if (!rest.includes(delim)) {
+                            inMultilineComment = true;
+                        }
+                        processedLines.push({
+                            ln: lineLabel,
+                            html: '<span class="cm">' + escapeHtml(line) + '</span>',
+                            unitChange: null
+                        });
+                        continue;
+                    }
+
+                    if (trimmed.startsWith("#")) {
+                        processedLines.push({
+                            ln: lineLabel,
+                            html: '<span class="cm">' + escapeHtml(line) + '</span>',
+                            unitChange: null
+                        });
+                        continue;
+                    }
+
+                    processedLines.push({
+                        ln: lineLabel,
+                        html: highlightPythonCode(line),
+                        unitChange: null
+                    });
+                }
+
+                const LINES_PER_PAGE = 52;
+                const totalPages = Math.ceil(processedLines.length / LINES_PER_PAGE);
+                const bookRoot = document.getElementById("book-root");
+                bookRoot.innerHTML = "";
+
+                let currentUnitTag = "UNIT 1.0: FUNDAMENTALS OF PYTHON SYNTAX";
+
+                for (let pageIdx = 0; pageIdx < totalPages; pageIdx++) {
+                    const startLine = pageIdx * LINES_PER_PAGE;
+                    const endLine = Math.min(startLine + LINES_PER_PAGE, processedLines.length);
+                    const pageSlice = processedLines.slice(startLine, endLine);
+
+                    for (const item of pageSlice) {
+                        if (item.unitChange) {
+                            currentUnitTag = item.unitChange;
+                        }
+                    }
+
+                    const pageEl = document.createElement("section");
+                    pageEl.className = "a4-page";
+
+                    const headerEl = document.createElement("header");
+                    headerEl.className = "page-header";
+                    headerEl.innerHTML =
+                        '<span class="kw"># SBTE_BIHAR :: 2418305_PYTHON_PROGRAMMING</span>' +
+                        '<span class="fn">' + escapeHtml(currentUnitTag) + '</span>';
+
+                    const sheetEl = document.createElement("div");
+                    sheetEl.className = "code-sheet";
+
+                    let linesHtml = "";
+                    for (let i = 0; i < pageSlice.length; i++) {
+                        const row = pageSlice[i];
+                        linesHtml +=
+                            '<div class="code-line">' +
+                            '<span class="ln">' + escapeHtml(row.ln) + '</span>' +
+                            '<span class="lc">' + row.html + '</span>' +
+                            '</div>';
+                    }
+                    sheetEl.innerHTML = linesHtml;
+
+                    const footerEl = document.createElement("footer");
+                    footerEl.className = "page-footer";
+                    footerEl.innerHTML =
+                        '<span># SBTE SYLLABUS UNIT 1.0 TO 6.0 CODE BOOK</span>' +
+                        '<span class="tm">A4_PRINT_BOOK // PAGE ' + String(pageIdx + 1).padStart(2, "0") + ' OF ' + String(totalPages).padStart(2, "0") + '</span>';
+
+                    pageEl.appendChild(headerEl);
+                    pageEl.appendChild(sheetEl);
+                    pageEl.appendChild(footerEl);
+                    bookRoot.appendChild(pageEl);
+                }
+
+                const counterEl = document.getElementById("page-counter");
+                if (counterEl) {
+                    counterEl.textContent = "A4 PAGES: " + totalPages + " | LINES: " + processedLines.length;
+                }
+            }
+
+            function highlightPythonCode(rawLine) {
+                const tokenRegex = /(f?"(?:\\.|[^"\\])*"|f?'(?:\\.|[^'\\])*'|r"(?:\\.|[^"\\])*"|r'(?:\\.|[^'\\])*'|#.*$|\b[A-Za-z_][A-Za-z0-9_]*\b|\b\d+(?:\.\d+)?(?:e[+-]?\d+)?j?\b|[+\-*/%=<>!&|^~]+|[()[\]{}.,:;@])/g;
+                let lastIndex = 0;
+                let output = "";
+                let match;
+                let prevToken = "";
+
+                while ((match = tokenRegex.exec(rawLine)) !== null) {
+                    if (match.index > lastIndex) {
+                        output += escapeHtml(rawLine.slice(lastIndex, match.index));
+                    }
+                    const tok = match[0];
+
+                    if (tok.startsWith("#")) {
+                        output += '<span class="cm">' + escapeHtml(tok) + '</span>';
+                    } else if (
+                        tok.startsWith('"') || tok.startsWith("'") ||
+                        tok.startsWith('f"') || tok.startsWith("f'") ||
+                        tok.startsWith('r"') || tok.startsWith("r'")
+                    ) {
+                        output += '<span class="st">' + escapeHtml(tok) + '</span>';
+                    } else if (KEYWORDS.has(tok)) {
+                        output += '<span class="kw">' + escapeHtml(tok) + '</span>';
+                    } else if (BUILTINS.has(tok) || prevToken === "def" || prevToken === "class" || tok.startsWith("__")) {
+                        output += '<span class="fn">' + escapeHtml(tok) + '</span>';
+                    } else {
+                        const afterIdx = match.index + tok.length;
+                        const nextChar = rawLine[afterIdx] || "";
+                        if (/^[A-Za-z_][A-Za-z0-9_]*$/.test(tok) && nextChar === "(") {
+                            output += '<span class="fn">' + escapeHtml(tok) + '</span>';
+                        } else {
+                            output += '<span class="tx">' + escapeHtml(tok) + '</span>';
+                        }
+                    }
+
+                    if (tok.trim().length > 0) {
+                        prevToken = tok;
+                    }
+                    lastIndex = tokenRegex.lastIndex;
+                }
+
+                if (lastIndex < rawLine.length) {
+                    output += escapeHtml(rawLine.slice(lastIndex));
+                }
+
+                return output || "&nbsp;";
+            }
+
+            window.addEventListener("DOMContentLoaded", buildA4CodeBook);
+        })();
+    </script>
+</body>
+</html>
