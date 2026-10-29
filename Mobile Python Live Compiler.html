@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0b1020">
+    <title>Mobile Python Compiler</title>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts: Inter for UI, JetBrains Mono for Code -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- CodeMirror Core and Theme for Editor -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/material-darker.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        compiler: {
+                            bg: '#0b1020',
+                            panel: '#111827',
+                            editorBg: '#1a202c',
+                            terminalBg: '#05080f',
+                            accent: '#3776AB',
+                            accentHover: '#2a5d8c',
+                            yellow: '#FFD43B',
+                            error: '#ef4444',
+                            success: '#10b981'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Base Full-Screen Setup */
+        :root {
+            --sat: env(safe-area-inset-top);
+            --sab: env(safe-area-inset-bottom);
+            --sar: env(safe-area-inset-right);
+            --sal: env(safe-area-inset-left);
+        }
+
+        html, body {
+            height: 100dvh;
+            width: 100vw;
+            margin: 0;
+            padding: 0;
+            background-color: #0b1020;
+            color: #f8fafc;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        #app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            padding-top: var(--sat);
+            padding-bottom: var(--sab);
+            padding-left: var(--sal);
+            padding-right: var(--sar);
+        }
+
+        header {
+            flex-shrink: 0;
+            background: rgba(17, 24, 39, 0.88);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            z-index: 10;
+        }
+
+        #editor-container {
+            flex: 1 1 50%;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            position: relative;
+            background-color: #1a202c;
+        }
+
+        .CodeMirror {
+            height: 100% !important;
+            font-family: 'JetBrains Mono', monospace !important;
+            font-size: 14px;
+            background-color: transparent !important;
+        }
+        
+        .CodeMirror-gutters {
+            background-color: #1a202c !important;
+            border-right: 1px solid rgba(255,255,255,0.05) !important;
+        }
+        
+        .CodeMirror-linenumber {
+            color: #64748b !important;
+        }
+
+        #controls-container {
+            flex-shrink: 0;
+            background-color: #111827;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 10px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.2);
+        }
+
+        #terminal-container {
+            flex: 1 1 40%;
+            background-color: #05080f;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .terminal-header {
+            flex-shrink: 0;
+            padding: 8px 12px;
+            background-color: #0f172a;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 11px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #terminal-output {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            line-height: 1.55;
+            color: #e2e8f0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            scroll-behavior: smooth;
+        }
+
+        #terminal-output::-webkit-scrollbar {
+            width: 4px;
+        }
+        #terminal-output::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        #terminal-output::-webkit-scrollbar-thumb {
+            background: rgba(100, 116, 139, 0.5);
+            border-radius: 4px;
+        }
+
+        .term-prompt { color: #10b981; font-weight: 600; }
+        .term-error { color: #ef4444; }
+        .term-info { color: #38bdf8; }
+        .term-warning { color: #f59e0b; }
+        .term-user-input { color: #fde047; font-weight: 600; }
+
+        /* Custom Sequential Input Message Box Modal */
+        #input-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(3, 7, 18, 0.78);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 60;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+        }
+        
+        #input-modal.active {
+            display: flex;
+            animation: modalPop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Toast Notification */
+        #toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(17, 24, 39, 0.95);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100;
+            border: 1px solid rgba(255,255,255,0.12);
+            backdrop-filter: blur(8px);
+        }
+
+        #toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        @keyframes modalPop {
+            from { opacity: 0; transform: scale(0.95) translateY(8px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        
+        .btn-press {
+            transition: transform 0.1s;
+        }
+        .btn-press:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        
+        <!-- Header -->
+        <header class="flex items-center justify-between px-4 py-3">
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-800 border border-slate-700 text-slate-400 hover:text-white transition-colors active:scale-95">
+                    <i class="fas fa-chevron-left text-sm"></i>
+                </a>
+                <div class="flex flex-col">
+                    <div class="flex items-center gap-2">
+                        <i class="fab fa-python text-compiler-yellow text-lg"></i>
+                        <h1 class="text-white font-bold text-base leading-none">Python Live</h1>
+                    </div>
+                    <span class="text-[10px] text-emerald-400 font-medium mt-0.5">NumPy • Pandas • SciPy Ready</span>
+                </div>
+            </div>
+            
+            <!-- Status Indicator -->
+            <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/70 border border-slate-700">
+                <div id="status-dot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></div>
+                <span id="status-text" class="text-xs font-medium text-slate-300">Loading Env...</span>
+            </div>
+        </header>
+
+        <!-- Editor Section -->
+        <div id="editor-container">
+            <textarea id="code-editor"># Interactive Input & NumPy Demo
+import numpy as np
+
+name = input("Enter your name: ")
+num1 = int(input("Enter first number: "))
+num2 = int(input("Enter second number: "))
+
+arr = np.array([num1, num2])
+print(f"\nHello {name}! 🐍")
+print(f"NumPy Array: {arr}")
+print(f"Sum = {np.sum(arr)} | Mean = {np.mean(arr)}")
+</textarea>
+        </div>
+
+        <!-- Controls Section -->
+        <div id="controls-container">
+            <button id="btn-run" disabled class="btn-press flex-1 bg-compiler-accent text-white font-semibold py-3 rounded-xl shadow-lg flex items-center justify-center gap-2 relative overflow-hidden opacity-50">
+                <i class="fas fa-play"></i> Run Code
+            </button>
+            <button id="btn-clear" class="btn-press px-5 bg-slate-800 border border-slate-700 text-slate-300 font-medium rounded-xl flex items-center justify-center gap-2 active:bg-slate-700">
+                <i class="fas fa-eraser"></i> Clear
+            </button>
+            <button id="btn-copy" class="btn-press px-5 bg-slate-800 border border-slate-700 text-slate-300 font-medium rounded-xl flex items-center justify-center gap-2 active:bg-slate-700">
+                <i class="fas fa-copy"></i> Copy
+            </button>
+        </div>
+
+        <!-- Terminal Section -->
+        <div id="terminal-container">
+            <div class="terminal-header">
+                <span class="flex items-center gap-2"><i class="fas fa-terminal text-compiler-yellow"></i> Terminal Output</span>
+                <span id="pkg-badge" class="text-[10px] text-cyan-400 font-mono">Initializing...</span>
+            </div>
+            <div id="terminal-output"><span class="term-info">Loading Python Engine & Core Libraries (NumPy, Pandas)...</span>
+</div>
+        </div>
+
+    </div>
+
+    <!-- Custom Sequential Input Message Box Modal -->
+    <div id="input-modal">
+        <div class="bg-slate-900 border border-cyan-500/40 rounded-2xl w-full max-w-sm p-5 shadow-[0_20px_50px_rgba(0,0,0,0.8)] flex flex-col gap-3.5">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+                <div class="flex items-center gap-2.5 text-white font-bold text-sm">
+                    <div class="w-7 h-7 rounded-lg bg-compiler-accent/20 border border-compiler-accent/40 flex items-center justify-center">
+                        <i class="fas fa-comment-dots text-cyan-400 text-xs"></i>
+                    </div>
+                    <span>Python Input Required</span>
+                </div>
+                <span id="input-step-badge" class="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">Input #1</span>
+            </div>
+
+            <!-- Message Box Prompt -->
+            <div class="bg-slate-950/90 border border-slate-800 rounded-xl p-3">
+                <p id="input-prompt-text" class="text-amber-300 font-mono text-xs sm:text-sm break-words leading-relaxed">Enter your input:</p>
+            </div>
+
+            <!-- Input Text Box -->
+            <input type="text" id="custom-input-field" 
+                placeholder="Type your input value here..." 
+                class="w-full bg-slate-800/90 border border-slate-600 rounded-xl px-4 py-3 text-white font-mono text-sm focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all" 
+                autocomplete="off" autocorrect="off" autocapitalize="off">
+
+            <div class="flex items-center justify-end gap-2.5 pt-1">
+                <button id="btn-cancel-input" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-colors active:scale-95">
+                    Cancel
+                </button>
+                <button id="btn-submit-input" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-6 py-2.5 rounded-xl font-bold text-xs sm:text-sm shadow-lg shadow-cyan-500/20 transition-all active:scale-95 flex items-center gap-1.5">
+                    <span>OK</span> <i class="fas fa-arrow-right text-xs"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast"><i class="fas fa-check-circle text-compiler-success mr-2"></i> <span id="toast-msg">Action successful</span></div>
+
+    <!-- CodeMirror JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/closebrackets.min.js"></script>
+    
+    <!-- Pyodide -->
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+
+    <script>
+        // DOM Elements
+        const terminalOutput = document.getElementById('terminal-output');
+        const btnRun = document.getElementById('btn-run');
+        const btnClear = document.getElementById('btn-clear');
+        const btnCopy = document.getElementById('btn-copy');
+        const statusDot = document.getElementById('status-dot');
+        const statusText = document.getElementById('status-text');
+        const pkgBadge = document.getElementById('pkg-badge');
+        const toastEl = document.getElementById('toast');
+        const toastMsg = document.getElementById('toast-msg');
+        
+        // Input Modal Elements
+        const inputModal = document.getElementById('input-modal');
+        const inputField = document.getElementById('custom-input-field');
+        const inputPromptText = document.getElementById('input-prompt-text');
+        const inputStepBadge = document.getElementById('input-step-badge');
+        const btnSubmitInput = document.getElementById('btn-submit-input');
+        const btnCancelInput = document.getElementById('btn-cancel-input');
+
+        // State
+        let pyodideInstance = null;
+        let isExecuting = false;
+        let inputResolve = null;
+        let inputReject = null;
+        let inputCounter = 0;
+
+        // Initialize CodeMirror Editor
+        const editor = CodeMirror.fromTextArea(document.getElementById('code-editor'), {
+            mode: 'python',
+            theme: 'material-darker',
+            lineNumbers: true,
+            indentUnit: 4,
+            tabSize: 4,
+            lineWrapping: true,
+            autoCloseBrackets: true,
+            viewportMargin: Infinity,
+            extraKeys: {
+                "Tab": function(cm) {
+                    cm.replaceSelection("    ", "end");
+                }
+            }
+        });
+
+        setTimeout(() => editor.refresh(), 100);
+        window.addEventListener('resize', () => editor.refresh());
+
+        function showToast(message) {
+            toastMsg.textContent = message;
+            toastEl.classList.add('show');
+            setTimeout(() => {
+                toastEl.classList.remove('show');
+            }, 2200);
+        }
+
+        function appendTerminal(text, type = 'normal') {
+            if (text === undefined || text === null) return;
+            const span = document.createElement('span');
+            let escapedText = String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            
+            if (type === 'prompt') {
+                span.className = 'term-prompt';
+                escapedText = `$ ${escapedText}\n`;
+            } else if (type === 'error') {
+                span.className = 'term-error';
+            } else if (type === 'info') {
+                span.className = 'term-info';
+                escapedText = `${escapedText}\n`;
+            } else if (type === 'warning') {
+                span.className = 'term-warning';
+            } else if (type === 'user-input') {
+                span.className = 'term-user-input';
+            }
+            
+            span.innerHTML = escapedText;
+            terminalOutput.appendChild(span);
+            terminalOutput.scrollTop = terminalOutput.scrollHeight;
+        }
+
+        function updateStatus(state, customMsg) {
+            statusDot.className = 'w-2 h-2 rounded-full';
+            if (state === 'loading') {
+                statusDot.classList.add('bg-amber-400', 'animate-pulse');
+                statusText.textContent = customMsg || 'Loading Env...';
+                btnRun.disabled = true;
+                btnRun.style.opacity = '0.5';
+            } else if (state === 'ready') {
+                statusDot.classList.add('bg-compiler-success');
+                statusText.textContent = 'Ready';
+                btnRun.disabled = false;
+                btnRun.style.opacity = '1';
+                btnRun.innerHTML = '<i class="fas fa-play"></i> Run Code';
+            } else if (state === 'running') {
+                statusDot.classList.add('bg-cyan-400', 'animate-pulse');
+                statusText.textContent = customMsg || 'Running...';
+                btnRun.disabled = true;
+                btnRun.style.opacity = '0.7';
+                btnRun.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Running';
+            } else if (state === 'error') {
+                statusDot.classList.add('bg-compiler-error');
+                statusText.textContent = 'Error';
+                btnRun.disabled = false;
+                btnRun.style.opacity = '1';
+                btnRun.innerHTML = '<i class="fas fa-play"></i> Run Code';
+            }
+        }
+
+        // Sequential Input Handler called by Python one-by-one whenever input() is reached
+        window.requestPythonInput = function(promptText) {
+            return new Promise((resolve, reject) => {
+                inputCounter += 1;
+                const cleanPrompt = (promptText !== undefined && promptText !== null && String(promptText).trim() !== '')
+                    ? String(promptText)
+                    : 'Enter value for input():';
+
+                // Print the prompt in the terminal first
+                if (promptText) {
+                    appendTerminal(String(promptText), 'normal');
+                }
+
+                inputStepBadge.textContent = `Input #${inputCounter}`;
+                inputPromptText.textContent = cleanPrompt;
+                inputField.value = '';
+                inputModal.classList.add('active');
+                statusText.textContent = 'Waiting for Input...';
+
+                setTimeout(() => inputField.focus(), 60);
+
+                inputResolve = resolve;
+                inputReject = reject;
+            });
+        };
+
+        function submitSequentialInput() {
+            if (!inputResolve) return;
+            const val = inputField.value;
+            inputModal.classList.remove('active');
+            statusText.textContent = 'Running...';
+
+            // Echo user's entered value in yellow in the terminal
+            appendTerminal(val + '\n', 'user-input');
+
+            const res = inputResolve;
+            inputResolve = null;
+            inputReject = null;
+            res(val);
+        }
+
+        function cancelSequentialInput() {
+            if (!inputReject) return;
+            inputModal.classList.remove('active');
+            appendTerminal('\n[Input Cancelled by User]\n', 'warning');
+            const rej = inputReject;
+            inputResolve = null;
+            inputReject = null;
+            rej(new Error('KeyboardInterrupt: Input cancelled by user'));
+        }
+
+        btnSubmitInput.addEventListener('click', submitSequentialInput);
+        btnCancelInput.addEventListener('click', cancelSequentialInput);
+        inputField.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                submitSequentialInput();
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                cancelSequentialInput();
+            }
+        });
+
+        // Initialize Pyodide + Pre-install Core Packages + AST Sequential Input Transformer
+        async function initPython() {
+            updateStatus('loading', 'Loading Python...');
+            try {
+                pyodideInstance = await loadPyodide();
+
+                updateStatus('loading', 'Loading Packages...');
+                pkgBadge.textContent = 'Installing NumPy & Pandas...';
+
+                // Pre-load important scientific packages so there are zero import errors
+                await pyodideInstance.loadPackage(['numpy', 'pandas', 'micropip']);
+
+                // Configure stdout, stderr, and AST-based async input transformer
+                // This AST transformer automatically converts `input(...)` (even inside int(input()), loops, or user functions)
+                // into `await __async_input__(...)` so execution genuinely pauses for each input modal one-by-one!
+                await pyodideInstance.runPythonAsync(`
+import sys
+import ast
+import builtins
+import js
+
+class TerminalWriter:
+    def write(self, text):
+        js.appendTerminal(text, "normal")
+    def flush(self):
+        pass
+
+sys.stdout = TerminalWriter()
+sys.stderr = TerminalWriter()
+
+async def __async_input__(prompt=""):
+    val = await js.requestPythonInput(str(prompt) if prompt is not None else "")
+    return str(val)
+
+builtins.__async_input__ = __async_input__
+builtins.input = __async_input__
+
+class _AsyncInputTransformer(ast.NodeTransformer):
+    def __init__(self):
+        self.async_funcs = set()
+
+    def visit_FunctionDef(self, node):
+        self.generic_visit(node)
+        for child in ast.walk(node):
+            if isinstance(child, ast.Await):
+                self.async_funcs.add(node.name)
+                new_node = ast.AsyncFunctionDef(
+                    name=node.name,
+                    args=node.args,
+                    body=node.body,
+                    decorator_list=node.decorator_list,
+                    returns=node.returns,
+                    type_comment=getattr(node, 'type_comment', None)
+                )
+                ast.copy_location(new_node, node)
+                return new_node
+        return node
+
+    def visit_Call(self, node):
+        self.generic_visit(node)
+        if isinstance(node.func, ast.Name) and node.func.id == 'input':
+            new_call = ast.Call(
+                func=ast.Name(id='__async_input__', ctx=ast.Load()),
+                args=node.args,
+                keywords=node.keywords
+            )
+            ast.copy_location(new_call, node)
+            await_node = ast.Await(value=new_call)
+            ast.copy_location(await_node, node)
+            return await_node
+        elif isinstance(node.func, ast.Name) and node.func.id in self.async_funcs:
+            await_node = ast.Await(value=node)
+            ast.copy_location(await_node, node)
+            return await_node
+        return node
+
+def __transform_user_code__(source_code):
+    try:
+        tree = ast.parse(source_code)
+        transformer = _AsyncInputTransformer()
+        tree = transformer.visit(tree)
+        # Second pass in case a function became async and is called later
+        tree = transformer.visit(tree)
+        ast.fix_missing_locations(tree)
+        return ast.unparse(tree)
+    except Exception:
+        # If there is a syntax error, return original code so Python raises normal SyntaxError
+        return source_code
+                `);
+
+                pkgBadge.textContent = 'NumPy • Pandas • Auto-Pkg Ready';
+                terminalOutput.innerHTML = '';
+                appendTerminal('Python 3.11 + NumPy & Pandas Ready! 🐍', 'info');
+                updateStatus('ready');
+            } catch (error) {
+                console.error("Failed to load Pyodide:", error);
+                appendTerminal('Failed to load Python environment. Please check internet connection and reload.', 'error');
+                updateStatus('error');
+            }
+        }
+
+        // Run Code Execution with Auto-Package Installer & Sequential Input Support
+        async function runCode() {
+            if (isExecuting || !pyodideInstance) return;
+            
+            const code = editor.getValue();
+            if (!code.trim()) {
+                showToast("Code is empty");
+                return;
+            }
+
+            isExecuting = true;
+            inputCounter = 0;
+            updateStatus('running', 'Checking Packages...');
+            appendTerminal('python main.py', 'prompt');
+            
+            try {
+                // Automatically detect and install any extra imported libraries (e.g., scipy, matplotlib, sklearn, sympy)
+                await pyodideInstance.loadPackagesFromImports(code);
+
+                updateStatus('running', 'Executing...');
+
+                // Transform code so any `input()` call (including `int(input())`, multiple inputs, loops) pauses and waits for user input box
+                pyodideInstance.globals.set("__raw_user_code__", code);
+                const transformedCode = await pyodideInstance.runPythonAsync(`__transform_user_code__(__raw_user_code__)`);
+
+                // Execute in top-level async context
+                await pyodideInstance.runPythonAsync(transformedCode);
+                
+                updateStatus('ready');
+            } catch (error) {
+                let errorStr = error.toString();
+                if (errorStr.includes("PythonError:")) {
+                    errorStr = errorStr.split('PythonError:').pop().trim();
+                }
+                appendTerminal(`\n${errorStr}\n`, 'error');
+                updateStatus('error');
+                setTimeout(() => updateStatus('ready'), 2000);
+            } finally {
+                isExecuting = false;
+                inputModal.classList.remove('active');
+            }
+        }
+
+        // Event Listeners for Controls
+        btnRun.addEventListener('click', runCode);
+
+        btnClear.addEventListener('click', () => {
+            terminalOutput.innerHTML = '';
+            showToast("Terminal cleared");
+        });
+
+        btnCopy.addEventListener('click', () => {
+            const code = editor.getValue();
+            navigator.clipboard.writeText(code).then(() => {
+                showToast("Code copied to clipboard");
+            }).catch(() => {
+                showToast("Failed to copy");
+            });
+        });
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            initPython();
+        });
+    </script>
+</body>
+</html>

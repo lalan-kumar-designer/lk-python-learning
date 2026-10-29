@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a0f1c">
+    <title>LK PYTHON LEARNING | Premium Study Platform</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Tailwind CSS with Typography Plugin -->
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    
+    <!-- Google Fonts: Outfit for UI, JetBrains Mono for Code -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- PrismJS syntax highlighting (Tomorrow Night Theme) & Line Numbers -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet" />
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        navy: {
+                            950: '#03050a',
+                            900: '#0a0f1c',
+                            800: '#111827',
+                            700: '#1e293b',
+                        },
+                        accent: {
+                            400: '#22d3ee',
+                            500: '#0ea5e9',
+                            600: '#2563eb',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.35s ease-out forwards',
+                        'slide-up': 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'pop-in': 'popIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards',
+                        'float': 'float 3s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translate3d(0, 16px, 0)' },
+                            '100%': { opacity: '1', transform: 'translate3d(0, 0, 0)' }
+                        },
+                        popIn: {
+                            '0%': { opacity: '0', transform: 'scale3d(0.96, 0.96, 1) translate3d(0, 8px, 0)' },
+                            '100%': { opacity: '1', transform: 'scale3d(1, 1, 1) translate3d(0, 0, 0)' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translate3d(0, 0, 0)' },
+                            '50%': { transform: 'translate3d(0, -4px, 0)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Base Premium Styling - Optimized for Zero Lag */
+        body { 
+            background-color: #060913; 
+            color: #f8fafc; 
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(34, 211, 238, 0.07) 0%, transparent 40%),
+                radial-gradient(circle at 85% 80%, rgba(59, 130, 246, 0.07) 0%, transparent 40%);
+            overflow-x: hidden;
+        }
+        
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #060913; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #22d3ee; }
+
+        /* Lightweight Glass Panel (Reduced blur radius to prevent GPU lag) */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.82);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Hardware-Accelerated Stylish Card */
+        .stylish-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.55) 0%, rgba(15, 23, 42, 0.85) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            will-change: transform, border-color, box-shadow;
+            transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), 
+                        border-color 0.25s ease, 
+                        box-shadow 0.25s ease,
+                        background 0.25s ease;
+        }
+        
+        .stylish-card:hover {
+            transform: translate3d(0, -6px, 0);
+            border-color: rgba(34, 211, 238, 0.5);
+            box-shadow: 0 14px 28px -8px rgba(34, 211, 238, 0.2), 0 0 15px -3px rgba(59, 130, 246, 0.15);
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.95) 100%);
+        }
+
+        .stylish-card:active {
+            transform: translate3d(0, -1px, 0) scale(0.98);
+        }
+
+        /* 3D Perspective & Interactive Cards (Hardware Accelerated) */
+        .scene-3d {
+            perspective: 1200px;
+        }
+
+        .card-3d {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.75) 0%, rgba(11, 17, 32, 0.95) 100%);
+            border-top: 1px solid rgba(255, 255, 255, 0.16);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            border-right: 1px solid rgba(255, 255, 255, 0.04);
+            border-bottom: 5px solid rgba(2, 6, 23, 0.95);
+            box-shadow: 
+                0 14px 24px -6px rgba(0, 0, 0, 0.6),
+                inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            transform-style: preserve-3d;
+            will-change: transform, box-shadow;
+            transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+                        box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+                        border-color 0.28s ease;
+        }
+
+        .card-3d:hover {
+            transform: translate3d(0, -8px, 18px) rotateX(6deg) rotateY(-4deg);
+            border-top-color: rgba(34, 211, 238, 0.55);
+            border-bottom-color: rgba(8, 145, 178, 0.65);
+            box-shadow: 
+                -8px 22px 32px -8px rgba(0, 0, 0, 0.75),
+                0 0 22px -4px rgba(34, 211, 238, 0.25);
+        }
+
+        .card-3d:active {
+            transform: translate3d(0, -2px, 5px) rotateX(2deg) scale(0.98);
+        }
+
+        .depth-layer-icon {
+            transform: translateZ(28px);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.55));
+        }
+
+        .card-3d:hover .depth-layer-icon {
+            transform: translateZ(42px) scale(1.08) rotateZ(-2deg);
+        }
+
+        .depth-layer-text {
+            transform: translateZ(18px);
+        }
+
+        /* Staggered Entrance Animation */
+        .card-enter {
+            opacity: 0;
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #22d3ee 0%, #3b82f6 50%, #818cf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Prism Code Block Customization */
+        pre[class*="language-"] {
+            margin: 0 !important;
+            border-radius: 0 0 1rem 1rem !important;
+            background: #0d1321 !important;
+            border: none !important;
+            font-family: 'JetBrains Mono', monospace !important;
+            font-size: 0.95rem;
+        }
+        
+        code[class*="language-"] { font-family: 'JetBrains Mono', monospace !important; }
+
+        /* Premium Search Input Styling */
+        .search-glass {
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .search-glass:focus-within {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: rgba(34, 211, 238, 0.5);
+            box-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
+            transform: scale(1.01);
+        }
+
+        /* Terminal Styling */
+        .terminal-output {
+            background-color: #03050a;
+            color: #a5b4fc;
+            font-family: 'JetBrains Mono', monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        /* Premium Markdown Customizations - Enhanced Readability */
+        .prose-premium {
+            font-size: 1.1rem;
+            line-height: 1.85;
+            color: #f1f5f9 !important;
+        }
+        .prose-premium strong, .prose-premium b {
+            color: #ffffff !important;
+            font-weight: 700;
+        }
+        .prose-premium h1, .prose-premium h2, .prose-premium h3, .prose-premium h4 {
+            color: #ffffff !important;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+        }
+        .prose-premium h1 { font-size: 2.5rem; margin-bottom: 2rem; border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 1rem; }
+        .prose-premium h2 { font-size: 1.85rem; margin-top: 3rem; color: #22d3ee !important; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem;}
+        .prose-premium h3 { font-size: 1.5rem; margin-top: 2rem; color: #60a5fa !important;}
+        .prose-premium p { margin-bottom: 1.75rem; color: #f1f5f9 !important; }
+        .prose-premium a { color: #38bdf8 !important; text-decoration: none; border-bottom: 1px solid rgba(56, 189, 248, 0.4); padding-bottom: 2px; transition: all 0.2s;}
+        .prose-premium a:hover { color: #7dd3fc !important; border-color: #7dd3fc; }
+        .prose-premium ul, .prose-premium ol { padding-left: 1.5rem; margin-bottom: 1.75rem; color: #f1f5f9 !important; }
+        .prose-premium li { margin-bottom: 0.75rem; color: #f1f5f9 !important; }
+        .prose-premium li::marker { color: #22d3ee !important; }
+        .prose-premium pre { background: #05080f !important; border: 1px solid rgba(255,255,255,0.1); border-radius: 1rem !important; }
+        .prose-premium :where(code):not(:where([class~="not-prose"] *)) {
+            background-color: rgba(99, 102, 241, 0.2);
+            color: #c7d2fe !important;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+        }
+        .prose-premium blockquote {
+            border-left: 4px solid #22d3ee;
+            background: rgba(34, 211, 238, 0.05);
+            padding: 1.5rem 2rem;
+            border-radius: 0 1rem 1rem 0;
+            font-style: italic;
+            color: #e2e8f0 !important;
+            margin-bottom: 2rem;
+        }
+        .prose-premium table { width: 100%; text-align: left; border-collapse: collapse; margin: 2rem 0; }
+        .prose-premium th { border-bottom: 2px solid rgba(255,255,255,0.1); padding: 1.25rem; color: #ffffff !important; background: rgba(255,255,255,0.03); }
+        .prose-premium td { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 1.25rem; color: #f1f5f9 !important; }
+        .prose-premium hr { border-color: rgba(255,255,255,0.1); margin: 3rem 0; }
+        .prose-premium img { border-radius: 1rem; max-width: 100%; box-shadow: 0 8px 30px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); }
+
+        /* Fullscreen API Handlers */
+        #viewer-wrapper:-webkit-full-screen {
+            background-color: #0a0f1c !important;
+            border: none !important;
+            border-radius: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            max-width: 100% !important;
+            overflow-y: auto;
+        }
+        #viewer-wrapper:fullscreen {
+            background-color: #0a0f1c !important;
+            border: none !important;
+            border-radius: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            max-width: 100% !important;
+            overflow-y: auto;
+        }
+        
+        #viewer-wrapper:-webkit-full-screen .viewer-toolbar { display: none !important; }
+        #viewer-wrapper:fullscreen .viewer-toolbar { display: none !important; }
+        #viewer-wrapper:-webkit-full-screen .exit-fullscreen-btn { display: flex !important; }
+        #viewer-wrapper:fullscreen .exit-fullscreen-btn { display: flex !important; }
+        #viewer-wrapper:-webkit-full-screen .viewer-content { min-height: 100vh; padding: 3rem 2rem; }
+        #viewer-wrapper:fullscreen .viewer-content { min-height: 100vh; padding: 3rem 2rem; }
+
+        /* Continuous Dual-Ring Loader Customization */
+        .professional-loader {
+            position: relative;
+            width: 68px;
+            height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .professional-loader::before,
+        .professional-loader::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+        }
+        .professional-loader::before {
+            width: 100%;
+            height: 100%;
+            border: 4px solid rgba(34, 211, 238, 0.12);
+            border-top-color: #22d3ee;
+            border-right-color: #3b82f6;
+            animation: spinLoader 0.85s linear infinite;
+        }
+        .professional-loader::after {
+            width: 72%;
+            height: 72%;
+            border: 3px solid rgba(59, 130, 246, 0.12);
+            border-bottom-color: #818cf8;
+            animation: spinLoaderReverse 1.2s linear infinite;
+        }
+        @keyframes spinLoader {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes spinLoaderReverse {
+            0% { transform: rotate(360deg); }
+            100% { transform: rotate(0deg); }
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col selection:bg-accent-400 selection:text-navy-900">
+
+    <!-- Navigation Header -->
+    <header class="glass-panel sticky top-0 z-50 w-full border-b border-white/10" id="main-header">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-center justify-between h-auto md:h-24 py-4 md:py-0 gap-4">
+                
+                <!-- Logo / Title -->
+                <div class="flex items-center gap-4 cursor-pointer group active:scale-95 transition-transform duration-300" onclick="app.navigate('')">
+                    <div class="bg-gradient-to-br from-accent-400 to-accent-600 p-3 rounded-2xl shadow-lg shadow-accent-500/20 group-hover:shadow-accent-500/40 transition-all duration-300">
+                        <i class="fab fa-python text-3xl text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-extrabold text-white tracking-tight">LK PYTHON <span class="gradient-text">LEARNING</span></h1>
+                        <p class="text-[11px] md:text-xs text-accent-400 font-bold tracking-[0.2em] uppercase opacity-80 mt-1">Premium Study Platform</p>
+                    </div>
+                </div>
+
+                <!-- Global Search -->
+                <div class="relative w-full md:w-[450px]">
+                    <div class="relative search-glass rounded-2xl flex items-center bg-navy-900/40">
+                        <span class="pl-5 text-slate-400 text-lg">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" id="searchInput" 
+                            class="w-full pl-4 pr-5 py-3.5 bg-transparent text-white placeholder-slate-500 focus:outline-none text-base font-medium"
+                            placeholder="Search units, topics, files..." autocomplete="off">
+                        
+                        <!-- Search Results Dropdown -->
+                        <div id="searchResults" class="absolute top-full left-0 right-0 mt-3 glass-panel rounded-2xl hidden max-h-[450px] overflow-y-auto z-50 border border-white/10 shadow-2xl">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative">
+        
+        <!-- Breadcrumb Navigation -->
+        <nav class="flex items-center space-x-3 text-sm text-slate-400 mb-10 overflow-x-auto whitespace-nowrap pb-2 font-medium custom-scrollbar" id="breadcrumb">
+            <!-- Populated via JS -->
+        </nav>
+
+        <!-- Dynamic Content Container -->
+        <div id="content-container" class="relative min-h-[500px]">
+            <!-- Viewers and Cards will be injected here -->
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 py-8 mt-auto glass-panel" id="main-footer">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-slate-400 text-sm font-medium">
+                &copy; <span id="year"></span> LK Python Learning. <span class="block sm:inline mt-1 sm:mt-0 opacity-70">Elevate your coding journey.</span>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- PrismJS Core and Plugins -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+
+    <!-- Pyodide for Python Execution -->
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+
+    <script>
+        // --- Core Application Logic ---
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        const CONFIG = {
+            owner: 'lkstudiokatoriya-ai',
+            repo: 'lk-python-learning',
+            branch: 'main'
+        };
+
+        const state = {
+            fullTree: [],
+            currentPath: '',
+            fileCache: {},
+            pyodideInstance: null,
+            isPyodideLoading: false
+        };
+
+        const elements = {
+            container: document.getElementById('content-container'),
+            breadcrumb: document.getElementById('breadcrumb'),
+            searchInput: document.getElementById('searchInput'),
+            searchResults: document.getElementById('searchResults')
+        };
+
+        /* Strict file extension rule applied: Only .py and .md files allowed */
+        const ALLOWED_EXTENSIONS = ['.py', '.md'];
+        
+        // Folders and files to exclude (icons, app, README)
+        const EXCLUDED_FOLDERS = ['app', 'icon', 'icons', 'assets', 'images'];
+        const EXCLUDED_FILES = ['readme.md', 'readme'];
+
+        // Non-blocking Custom Input Modal for Python input()
+        function createCustomPromptModal(promptText) {
+            return new Promise((resolve) => {
+                const modal = document.createElement('div');
+                modal.className = 'fixed inset-0 z-[9999] flex items-center justify-center bg-black/75 p-4 animate-fade-in';
+                modal.innerHTML = `
+                    <div class="glass-panel rounded-2xl p-6 max-w-md w-full border border-accent-400/30 shadow-2xl animate-pop-in">
+                        <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                            <i class="fab fa-python text-accent-400"></i> Python Input Required
+                        </h3>
+                        <p class="text-sm text-slate-300 mb-4 font-mono">${promptText || 'Enter value:'}</p>
+                        <input type="text" id="py-modal-input" class="w-full px-4 py-3 rounded-xl bg-navy-950 border border-white/15 text-white focus:outline-none focus:border-accent-400 mb-4 font-mono text-sm" placeholder="Type here and press Enter..." autocomplete="off">
+                        <div class="flex justify-end gap-3">
+                            <button id="py-modal-submit" class="px-5 py-2.5 bg-gradient-to-r from-accent-500 to-accent-600 text-white rounded-xl font-bold text-sm hover:opacity-95 active:scale-95 transition-all">Submit</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                const inputEl = modal.querySelector('#py-modal-input');
+                const submitBtn = modal.querySelector('#py-modal-submit');
+                inputEl.focus();
+
+                const finish = () => {
+                    const val = inputEl.value;
+                    modal.remove();
+                    resolve(val);
+                };
+
+                submitBtn.addEventListener('click', finish);
+                inputEl.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') finish();
+                });
+            });
+        }
+
+        // --- Pyodide Initialization & Execution Logic (Zero Hang / Lazy Loaded) ---
+        async function loadPythonEngine() {
+            if (state.pyodideInstance) return state.pyodideInstance;
+            if (state.isPyodideLoading) {
+                while(state.isPyodideLoading) { await new Promise(r => setTimeout(r, 80)); }
+                return state.pyodideInstance;
+            }
+
+            state.isPyodideLoading = true;
+            try {
+                const pyodide = await loadPyodide();
+                
+                // Pre-load essential Python packages like NumPy and micropip so they work out of the box
+                await pyodide.loadPackage(['numpy', 'micropip']);
+                
+                window.appendTerminalOutput = (text) => {
+                    const outputEl = document.getElementById('py-output');
+                    if (outputEl) {
+                        outputEl.textContent += text;
+                        outputEl.scrollTop = outputEl.scrollHeight;
+                    }
+                };
+
+                window.promptUserForInput = (promptText) => {
+                    if (promptText) window.appendTerminalOutput(promptText);
+                    const userInput = window.prompt(promptText || "Python Program Input:") || "";
+                    window.appendTerminalOutput(userInput + "\n");
+                    return userInput;
+                };
+
+                await pyodide.runPythonAsync(`
+                    import sys
+                    import js
+                    import builtins
+
+                    class CustomIO:
+                        def write(self, text):
+                            js.appendTerminalOutput(text)
+                        def flush(self):
+                            pass
+
+                    sys.stdout = CustomIO()
+                    sys.stderr = CustomIO()
+                    def custom_input(prompt=""): return js.promptUserForInput(prompt)
+                    builtins.input = custom_input
+                `);
+
+                state.pyodideInstance = pyodide;
+                return pyodide;
+            } catch (err) {
+                console.error("Pyodide loading failed", err);
+                throw err;
+            } finally {
+                state.isPyodideLoading = false;
+            }
+        }
+
+        window.runPythonProgram = async (code) => {
+            const outputEl = document.getElementById('py-output');
+            const runBtn = document.getElementById('runBtn');
+            const originalBtnHtml = runBtn.innerHTML;
+            
+            outputEl.textContent = "Initializing Python Environment & Core Packages (NumPy)...\n";
+            runBtn.disabled = true;
+            runBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Running...`;
+
+            try {
+                const pyodide = await loadPythonEngine();
+                
+                // Automatically detect and load any additional required packages in the code (e.g. pandas, matplotlib, scipy, etc.)
+                outputEl.textContent = "Checking and installing required packages...\n";
+                await pyodide.loadPackagesFromImports(code);
+                
+                outputEl.textContent = ">>> Executing Program...\n\n";
+                await pyodide.runPythonAsync(code);
+                outputEl.textContent += "\n>>> Execution Completed.";
+            } catch (err) {
+                let errorStr = err.toString();
+                if (errorStr.includes("PythonError:")) errorStr = errorStr.split('PythonError:').pop().trim();
+                outputEl.textContent += `\n❌ Error:\n${errorStr}`;
+            } finally {
+                runBtn.disabled = false;
+                runBtn.innerHTML = originalBtnHtml;
+            }
+        };
+
+        window.clearPythonOutput = () => {
+            const outputEl = document.getElementById('py-output');
+            if (outputEl) outputEl.textContent = "Terminal cleared. Ready.\n";
+        };
+
+        // Fullscreen API toggle helper
+        window.toggleFullscreen = () => {
+            const viewer = document.getElementById('viewer-wrapper');
+            if (!viewer) return;
+            
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                if (viewer.requestFullscreen) {
+                    viewer.requestFullscreen().catch(err => console.error("Fullscreen error:", err));
+                } else if (viewer.webkitRequestFullscreen) {
+                    viewer.webkitRequestFullscreen(); 
+                }
+                if (screen.orientation && screen.orientation.lock) {
+                    screen.orientation.lock('landscape').catch(() => {});
+                }
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+            }
+        };
+
+        // --- Application Initialization ---
+        async function initApp() {
+            renderLoading('Loading Study Dashboard...');
+            try {
+                const response = await fetch(`https://api.github.com/repos/${CONFIG.owner}/${CONFIG.repo}/git/trees/${CONFIG.branch}?recursive=1`);
+                if (!response.ok) throw new Error('Failed to connect to repository structure.');
+                const data = await response.json();
+                
+                state.fullTree = data.tree.filter(item => {
+                    // Exclude hidden files
+                    if (item.path.startsWith('.') || item.path.includes('/.')) return false;
+                    
+                    const pathParts = item.path.split('/');
+                    const fileName = pathParts[pathParts.length - 1].toLowerCase();
+
+                    // Exclude README files anywhere
+                    if (EXCLUDED_FILES.includes(fileName) || fileName.startsWith('readme.')) {
+                        return false;
+                    }
+
+                    // Exclude specific folders like icon, icons, app
+                    if (pathParts.some(part => EXCLUDED_FOLDERS.includes(part.toLowerCase()))) {
+                        return false;
+                    }
+                    
+                    if (item.type === 'tree') return true;
+                    return ALLOWED_EXTENSIONS.some(ext => fileName.endsWith(ext));
+                });
+
+                // Render UI immediately without auto-loading heavy WebAssembly in background (prevents UI freeze/hang)
+                app.navigate('');
+            } catch (error) {
+                renderError('Unable to load study material. Please check connection and try again.');
+            }
+        }
+
+        // --- Formatting Helpers ---
+        const utils = {
+            formatName: (pathName) => {
+                let name = pathName.split('/').pop();
+                name = name.replace(/\.(py|md)$/i, '');
+                
+                // Advanced Formatting for "unit-1-title" or "unit_1_title" patterns
+                const unitMatch = name.match(/^(unit)[-_]?(\d+)[-_]+(.*)$/i);
+                if (unitMatch) {
+                    const unitStr = unitMatch[1].charAt(0).toUpperCase() + unitMatch[1].slice(1).toLowerCase();
+                    const num = unitMatch[2];
+                    const rest = unitMatch[3].replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    return `${unitStr} ${num}: ${rest}`;
+                }
+                
+                name = name.replace(/[-_]/g, ' ');
+                return name.replace(/\b\w/g, l => l.toUpperCase());
+            },
+            
+            get3DGraphic: (type) => {
+                if (type === 'py') {
+                    return `
+                        <svg viewBox="0 0 64 64" class="w-14 h-14 overflow-visible">
+                            <defs>
+                                <linearGradient id="pyPage3d" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#38bdf8" />
+                                    <stop offset="100%" stop-color="#1d4ed8" />
+                                </linearGradient>
+                                <linearGradient id="pyFold3d" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#bae6fd" />
+                                    <stop offset="100%" stop-color="#38bdf8" />
+                                </linearGradient>
+                            </defs>
+                            <!-- 3D Extrusion Base Shadow -->
+                            <rect x="12" y="10" width="40" height="48" rx="8" fill="#0f172a" opacity="0.7" transform="translate(3, 5)" />
+                            <!-- 3D Side Bevel -->
+                            <rect x="12" y="8" width="40" height="48" rx="8" fill="#1e3a8a" transform="translate(0, 3)" />
+                            <!-- Main 3D File Body -->
+                            <path d="M12 14 C12 10.686 14.686 8 18 8 L38 8 L52 22 L52 50 C52 53.314 49.314 56 46 56 L18 56 C14.686 56 12 53.314 12 50 Z" fill="url(#pyPage3d)" stroke="rgba(255,255,255,0.35)" stroke-width="1" />
+                            <!-- 3D Folded Corner -->
+                            <path d="M38 8 L38 18 C38 20.209 39.791 22 42 22 L52 22 Z" fill="url(#pyFold3d)" />
+                            <!-- Floating Python Emblem Plate -->
+                            <rect x="20" y="27" width="24" height="20" rx="5" fill="#090d16" opacity="0.85" />
+                            <text x="32" y="41" text-anchor="middle" fill="#fde047" font-family="JetBrains Mono, monospace" font-weight="800" font-size="11">PY</text>
+                        </svg>
+                    `;
+                }
+                if (type === 'md') {
+                    return `
+                        <svg viewBox="0 0 64 64" class="w-14 h-14 overflow-visible">
+                            <defs>
+                                <linearGradient id="mdPage3d" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#34d399" />
+                                    <stop offset="100%" stop-color="#047857" />
+                                </linearGradient>
+                                <linearGradient id="mdFold3d" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#a7f3d0" />
+                                    <stop offset="100%" stop-color="#34d399" />
+                                </linearGradient>
+                            </defs>
+                            <!-- 3D Extrusion Base Shadow -->
+                            <rect x="12" y="10" width="40" height="48" rx="8" fill="#0f172a" opacity="0.7" transform="translate(3, 5)" />
+                            <!-- 3D Side Bevel -->
+                            <rect x="12" y="8" width="40" height="48" rx="8" fill="#064e3b" transform="translate(0, 3)" />
+                            <!-- Main 3D Note Body -->
+                            <path d="M12 14 C12 10.686 14.686 8 18 8 L38 8 L52 22 L52 50 C52 53.314 49.314 56 46 56 L18 56 C14.686 56 12 53.314 12 50 Z" fill="url(#mdPage3d)" stroke="rgba(255,255,255,0.35)" stroke-width="1" />
+                            <!-- 3D Folded Corner -->
+                            <path d="M38 8 L38 18 C38 20.209 39.791 22 42 22 L52 22 Z" fill="url(#mdFold3d)" />
+                            <!-- 3D Engraved Lines -->
+                            <rect x="20" y="29" width="24" height="3.5" rx="1.75" fill="#ecfdf5" opacity="0.9" />
+                            <rect x="20" y="36" width="18" height="3.5" rx="1.75" fill="#ecfdf5" opacity="0.75" />
+                            <rect x="20" y="43" width="21" height="3.5" rx="1.75" fill="#ecfdf5" opacity="0.6" />
+                        </svg>
+                    `;
+                }
+                return `
+                    <svg viewBox="0 0 64 64" class="w-14 h-14 overflow-visible">
+                        <defs>
+                            <linearGradient id="folderBack3d" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#f59e0b" />
+                                <stop offset="100%" stop-color="#b45309" />
+                            </linearGradient>
+                            <linearGradient id="folderFront3d" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#fde047" />
+                                <stop offset="45%" stop-color="#fbbf24" />
+                                <stop offset="100%" stop-color="#d97706" />
+                            </linearGradient>
+                        </defs>
+                        <!-- 3D Base Drop Shadow -->
+                        <rect x="6" y="18" width="52" height="38" rx="8" fill="#090d16" opacity="0.75" transform="translate(2, 5)" />
+                        <!-- Back Folder Tab -->
+                        <path d="M6 18 C6 14.686 8.686 12 12 12 L25 12 C27 12 28.8 13.2 29.8 14.8 L32 18 L52 18 C55.314 18 58 20.686 58 24 L58 48 C58 51.314 55.314 54 52 54 L12 54 C8.686 54 6 51.314 6 48 Z" fill="url(#folderBack3d)" />
+                        <!-- 3D Inner White Paper Sheet -->
+                        <rect x="11" y="19" width="42" height="24" rx="4" fill="#f8fafc" opacity="0.92" />
+                        <rect x="16" y="23" width="20" height="2.5" rx="1.25" fill="#94a3b8" opacity="0.6" />
+                        <!-- 3D Bottom Bevel Lip -->
+                        <rect x="6" y="27" width="52" height="29" rx="8" fill="#92400e" />
+                        <!-- 3D Front Folder Flap -->
+                        <rect x="6" y="24" width="52" height="29" rx="8" fill="url(#folderFront3d)" stroke="rgba(255,255,255,0.45)" stroke-width="1" />
+                        <!-- Glossy Top Highlight -->
+                        <path d="M12 26 L52 26" stroke="rgba(255,255,255,0.55)" stroke-width="1.5" stroke-linecap="round" />
+                    </svg>
+                `;
+            },
+
+            getFileDetails: (filename) => {
+                const ext = filename.split('.').pop().toLowerCase();
+                if (ext === 'py') return { 
+                    icon: 'fab fa-python', 
+                    svg3d: utils.get3DGraphic('py'),
+                    badge: 'Python Code',
+                    color: 'text-cyan-400', 
+                    bg: 'bg-cyan-500/10', 
+                    border: 'border-cyan-500/25' 
+                };
+                if (ext === 'md') return { 
+                    icon: 'fas fa-book-open', 
+                    svg3d: utils.get3DGraphic('md'),
+                    badge: 'Study Note',
+                    color: 'text-emerald-400', 
+                    bg: 'bg-emerald-500/10', 
+                    border: 'border-emerald-500/25' 
+                };
+                
+                return { 
+                    icon: 'fas fa-folder', 
+                    svg3d: utils.get3DGraphic('folder'),
+                    badge: 'Unit Folder',
+                    color: 'text-amber-400', 
+                    bg: 'bg-amber-500/10', 
+                    border: 'border-amber-500/25' 
+                };
+            },
+
+            getChildren: (path) => {
+                const prefix = path === '' ? '' : `${path}/`;
+                return state.fullTree.filter(item => {
+                    if (!item.path.startsWith(prefix)) return false;
+                    const rem = item.path.substring(prefix.length);
+                    return rem.length > 0 && !rem.includes('/');
+                }).sort((a, b) => {
+                    if (a.type !== b.type) return a.type === 'tree' ? -1 : 1;
+                    return a.path.localeCompare(b.path);
+                });
+            }
+        };
+
+        // --- Navigation and View Rendering ---
+        const app = {
+            navigate: async (path) => {
+                state.currentPath = path;
+                elements.searchInput.value = '';
+                elements.searchResults.classList.add('hidden');
+                
+                app.updateBreadcrumbs();
+                const item = state.fullTree.find(i => i.path === path);
+                
+                // Keep container visible so the spinning loader never disappears or shows an empty gap
+                elements.container.className = "relative min-h-[500px]";
+                
+                if (item && item.type === 'blob') {
+                    await app.renderFileViewer(item);
+                } else {
+                    app.renderFolderView(path);
+                }
+
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            },
+
+            updateBreadcrumbs: () => {
+                const parts = state.currentPath.split('/').filter(p => p);
+                let html = `
+                    <button onclick="app.navigate('')" class="hover:text-white transition-colors flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-white/5 border border-transparent hover:border-white/10 active:scale-95 text-base">
+                        <i class="fas fa-home"></i> Home
+                    </button>
+                `;
+
+                let accumPath = '';
+                parts.forEach((part, index) => {
+                    accumPath += (accumPath ? '/' : '') + part;
+                    const isLast = index === parts.length - 1;
+                    const displayName = utils.formatName(part);
+                    
+                    html += `<i class="fas fa-chevron-right text-[11px] text-slate-600 mx-1"></i>`;
+                    
+                    if (isLast) {
+                        html += `<span class="px-4 py-2 text-accent-400 font-bold truncate max-w-[200px] sm:max-w-xs drop-shadow-[0_0_10px_rgba(34,211,238,0.4)] text-base" title="${displayName}">${displayName}</span>`;
+                    } else {
+                        html += `<button onclick="app.navigate('${accumPath}')" class="hover:text-white transition-colors px-4 py-2 rounded-xl hover:bg-white/5 border border-transparent hover:border-white/10 truncate max-w-[150px] sm:max-w-xs active:scale-95 text-base" title="${displayName}">${displayName}</button>`;
+                    }
+                });
+                elements.breadcrumb.innerHTML = html;
+            },
+
+            renderFolderView: (path) => {
+                const children = utils.getChildren(path);
+                if (children.length === 0) return renderEmptyFolder();
+
+                let html = `
+                    <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
+                        <div class="flex items-center gap-4 min-w-0">
+                            ${path !== '' ? `
+                                <button onclick="app.navigate('${path.split('/').slice(0, -1).join('/')}')" 
+                                    title="Go Back"
+                                    class="w-11 h-11 flex-shrink-0 bg-white/5 hover:bg-accent-500/20 border border-white/10 hover:border-accent-400/40 text-slate-300 hover:text-white rounded-xl transition-all flex items-center justify-center active:scale-95 group">
+                                    <i class="fas fa-arrow-left text-base group-hover:-translate-x-0.5 transition-transform"></i>
+                                </button>
+                            ` : ''}
+                            <div>
+                                <h2 class="text-2xl md:text-3xl font-extrabold text-white tracking-tight truncate" title="${utils.formatName(path)}">
+                                    ${path === '' ? 'Explore <span class="gradient-text">Study Units</span>' : utils.formatName(path)}
+                                </h2>
+                                <p class="text-xs sm:text-sm text-slate-400 mt-1">
+                                    ${path === '' ? 'Select a unit below to access Python programs and notes' : `${children.length} learning items available`}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 self-start sm:self-auto px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-accent-400">
+                            <span class="w-2 h-2 rounded-full bg-accent-400 animate-pulse"></span>
+                            ${children.length} ${children.length === 1 ? 'Item' : 'Items'}
+                        </div>
+                    </div>
+                    
+                    <div class="scene-3d grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                `;
+
+                children.forEach((item, index) => {
+                    const isFolder = item.type === 'tree';
+                    const name = utils.formatName(item.path);
+                    const rawName = item.path.split('/').pop();
+                    const details = isFolder ? utils.getFileDetails('folder') : utils.getFileDetails(item.path);
+                    const delay = Math.min(index * 35, 350);
+
+                    html += `
+                        <div onclick="app.navigate('${item.path}')" 
+                            style="animation-delay: ${delay}ms"
+                            class="card-3d card-enter rounded-2xl p-5 cursor-pointer group flex flex-col justify-between relative min-h-[155px]" title="${rawName}">
+                            
+                            <!-- Ambient Top-Right Glow -->
+                            <div class="absolute -right-6 -top-6 w-24 h-24 rounded-full ${details.bg} blur-2xl opacity-50 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+
+                            <div class="flex items-start justify-between gap-3 relative z-10">
+                                <!-- 3D Extruded Folder / File Icon -->
+                                <div class="depth-layer-icon flex items-center justify-center">
+                                    ${details.svg3d}
+                                </div>
+                                <span class="depth-layer-text text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg bg-navy-950/80 border ${details.border} ${details.color} shadow-sm">
+                                    ${details.badge}
+                                </span>
+                            </div>
+
+                            <div class="depth-layer-text mt-5 flex items-center justify-between gap-2 pt-3 border-t border-white/5 relative z-10">
+                                <h3 class="text-base font-extrabold text-slate-100 group-hover:text-accent-400 transition-colors line-clamp-2 leading-snug">
+                                    ${name}
+                                </h3>
+                                <div class="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 group-hover:bg-accent-500/20 group-hover:border-accent-400/40 transition-all transform group-hover:translate-x-1 shadow-inner">
+                                    <i class="fas fa-chevron-right ${details.color} text-xs"></i>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+                elements.container.innerHTML = html;
+            },
+
+            renderFileViewer: async (item) => {
+                const parentPath = item.path.split('/').slice(0, -1).join('/');
+                const fileName = item.path.split('/').pop();
+                const ext = fileName.split('.').pop().toLowerCase();
+                // Properly encode the file path to prevent errors with spaces or special characters
+                const encodedPath = item.path.split('/').map(encodeURIComponent).join('/');
+                const rawUrl = `https://raw.githubusercontent.com/${CONFIG.owner}/${CONFIG.repo}/${CONFIG.branch}/${encodedPath}`;
+                
+                renderLoading(`Loading...`);
+                
+                try {
+                    let content = state.fileCache[item.path];
+                    if (!content) {
+                        const response = await fetch(rawUrl);
+                        if (!response.ok) throw new Error('Failed to fetch file');
+                        content = await response.text();
+                        state.fileCache[item.path] = content;
+                    }
+
+                    if (ext === 'py') {
+                        app.renderPythonRunner(fileName, parentPath, content);
+                    } else if (ext === 'md') {
+                        app.renderMarkdownViewer(fileName, parentPath, content);
+                    }
+                } catch (error) {
+                    renderError(`Unable to load file. Network error or file missing.`);
+                }
+            },
+
+            renderPythonRunner: (fileName, parentPath, content) => {
+                const safeContent = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                const rawCodeBase64 = btoa(unescape(encodeURIComponent(content)));
+
+                elements.container.innerHTML = `
+                    <div class="w-full animate-slide-up">
+                        <div class="glass-panel border border-white/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col relative bg-navy-900/90">
+                            <!-- Code Viewer Toolbar (No Fullscreen) -->
+                            <div class="bg-navy-800/95 px-5 py-4 border-b border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 backdrop-blur-xl z-10 relative">
+                                <div class="flex items-center gap-4 w-full sm:w-auto min-w-0">
+                                    <button onclick="app.navigate('${parentPath}')" title="Go Back" class="flex-shrink-0 w-12 h-12 rounded-xl hover:bg-white/10 flex items-center justify-center text-slate-300 hover:text-white transition-all hover:scale-105 active:scale-95 bg-white/5 border border-white/10 shadow-md group">
+                                        <i class="fas fa-arrow-left text-lg group-hover:-translate-x-1 transition-transform"></i>
+                                    </button>
+                                    <div class="flex items-center gap-3 overflow-hidden">
+                                        <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-accent-400/10 border border-accent-400/20 flex items-center justify-center">
+                                            <i class="fab fa-python text-accent-400 text-2xl"></i>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <h2 class="text-white font-bold text-lg sm:text-xl leading-tight tracking-wide truncate" title="${fileName}">${fileName}</h2>
+                                            <span class="text-xs text-emerald-400 font-medium flex items-center gap-1 mt-0.5"><i class="fas fa-check-circle text-[10px]"></i> NumPy & Core Packages Ready</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center gap-3 w-full sm:w-auto">
+                                    <button onclick="app.copyCode()" id="copyBtn" class="flex-1 sm:flex-none px-5 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl transition-all text-sm font-bold flex items-center justify-center gap-2 group hover:scale-105 active:scale-95">
+                                        <i class="fas fa-copy text-slate-400 group-hover:text-white transition-colors"></i> <span>Copy</span>
+                                    </button>
+                                    <button onclick="runPythonProgram(decodeURIComponent(escape(atob('${rawCodeBase64}'))))" id="runBtn" class="flex-1 sm:flex-none px-8 py-3 bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-400 hover:to-accent-500 shadow-lg shadow-accent-500/30 text-white rounded-xl transition-all text-sm font-bold flex items-center justify-center gap-2 hover:scale-105 active:scale-95">
+                                        <i class="fas fa-play"></i> Run Code
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Viewer Content (Editor + Terminal) -->
+                            <div class="flex flex-col flex-grow">
+                                <div class="relative bg-[#0d1117] w-full overflow-hidden border-b border-white/5 flex-grow">
+                                    <pre class="line-numbers !m-0 !rounded-none !border-0 text-sm sm:text-base max-h-[60vh] custom-scrollbar overflow-y-auto"><code class="language-python" id="codeBlock">${safeContent}</code></pre>
+                                </div>
+
+                                <div class="bg-navy-950 flex flex-col flex-shrink-0">
+                                    <div class="flex items-center justify-between px-5 py-3 bg-[#080b12] border-b border-white/5">
+                                        <span class="text-xs sm:text-sm font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                            <i class="fas fa-terminal"></i> Terminal Output
+                                        </span>
+                                        <button onclick="clearPythonOutput()" class="text-xs sm:text-sm text-slate-500 hover:text-white transition-colors py-1.5 px-3 rounded-lg hover:bg-white/5 border border-transparent hover:border-white/10">
+                                            <i class="fas fa-eraser mr-1.5"></i> Clear
+                                        </button>
+                                    </div>
+                                    <div class="p-5 h-[250px] overflow-y-auto custom-scrollbar bg-[#03050a]">
+                                        <pre id="py-output" class="terminal-output text-sm sm:text-base leading-relaxed">Ready (NumPy & Auto-Package Installer Enabled). Click 'Run Code' to execute.\n</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                Prism.highlightAll();
+            },
+
+            renderMarkdownViewer: (fileName, parentPath, content) => {
+                marked.setOptions({
+                    breaks: true, gfm: true,
+                    highlight: (code, lang) => Prism.languages[lang] ? Prism.highlight(code, Prism.languages[lang], lang) : code
+                });
+
+                const htmlContent = marked.parse(content);
+                const title = utils.formatName(fileName);
+
+                elements.container.innerHTML = `
+                    <div class="w-full animate-slide-up">
+                        <div id="viewer-wrapper" class="glass-panel border border-white/10 rounded-3xl overflow-hidden shadow-2xl relative bg-navy-900/90">
+                            
+                            <!-- Notes Viewer Toolbar -->
+                            <div class="viewer-toolbar bg-navy-800/95 px-5 py-4 border-b border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 backdrop-blur-xl z-10 relative">
+                                <div class="flex items-center gap-4 w-full min-w-0">
+                                    <!-- BACK BUTTON: Extreme Left, Arrow Only -->
+                                    <button onclick="app.navigate('${parentPath}')" title="Go Back" class="flex-shrink-0 w-12 h-12 rounded-xl hover:bg-white/10 flex items-center justify-center text-slate-300 hover:text-white transition-all hover:scale-105 active:scale-95 bg-white/5 border border-white/10 shadow-md group">
+                                        <i class="fas fa-arrow-left text-lg group-hover:-translate-x-1 transition-transform"></i>
+                                    </button>
+                                    <div class="flex items-center gap-3 overflow-hidden">
+                                        <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center">
+                                            <i class="fas fa-file-alt text-emerald-400 text-xl"></i>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <h2 class="text-white font-bold text-lg sm:text-xl leading-tight tracking-wide truncate" title="${fileName}">${title}</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3 flex-shrink-0">
+                                    <button onclick="toggleFullscreen()" title="Fullscreen" class="w-12 h-12 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-xl transition-all flex items-center justify-center hover:shadow-lg hover:scale-105 active:scale-95">
+                                        <i class="fas fa-expand text-lg"></i>
+                                    </button>
+                                    <button onclick="app.downloadLongImage('${title.replace(/'/g, "\\'")}')" id="pdfBtn" class="px-5 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 shadow-lg shadow-emerald-500/30 text-white rounded-xl transition-all text-sm font-bold flex items-center justify-center gap-2 hover:scale-105 active:scale-95">
+                                        <i class="fas fa-image"></i> <span class="hidden sm:inline">Download Image</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Note Content Area -->
+                            <div class="viewer-content overflow-y-auto bg-[#03050a] p-6 sm:p-10 md:p-16">
+                                <div id="notes-export-area" class="max-w-4xl mx-auto bg-[#0a0f1c] rounded-3xl p-8 sm:p-12 md:p-16 border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+                                    <!-- Stylish Branding Header for Long Image Export -->
+                                    <div class="flex items-center justify-between pb-6 mb-8 border-b border-white/10">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-400 to-accent-600 flex items-center justify-center shadow-md">
+                                                <i class="fab fa-python text-white text-xl"></i>
+                                            </div>
+                                            <div>
+                                                <div class="text-sm font-extrabold text-white tracking-wider">LK PYTHON <span class="text-accent-400">LEARNING</span></div>
+                                                <div class="text-[11px] text-slate-400 font-medium">${title}</div>
+                                            </div>
+                                        </div>
+                                        <span class="text-[11px] font-mono text-accent-400 bg-accent-400/10 border border-accent-400/20 px-3 py-1 rounded-full">Study Notes</span>
+                                    </div>
+                                    <article class="prose prose-invert prose-premium w-full max-w-none">
+                                        ${htmlContent}
+                                    </article>
+                                </div>
+                            </div>
+                            
+                            <!-- Fullscreen Exit Floating Button -->
+                            <button onclick="toggleFullscreen()" title="Exit Fullscreen" class="exit-fullscreen-btn fixed bottom-8 right-8 z-[9999] w-14 h-14 bg-black/70 backdrop-blur-xl border border-white/20 rounded-full text-white hidden items-center justify-center hover:bg-white/20 hover:scale-110 active:scale-95 transition-all shadow-[0_0_30px_rgba(0,0,0,0.8)]">
+                                <i class="fas fa-compress text-2xl"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                Prism.highlightAll();
+            },
+
+            copyCode: () => {
+                const code = document.getElementById('codeBlock').textContent;
+                const btn = document.getElementById('copyBtn');
+                const span = btn.querySelector('span');
+                const icon = btn.querySelector('i');
+
+                const successUI = () => {
+                    span.textContent = 'Copied!';
+                    icon.className = 'fas fa-check text-emerald-400';
+                    btn.classList.add('border-emerald-500/50', 'bg-emerald-500/10');
+                    setTimeout(() => {
+                        span.textContent = 'Copy';
+                        icon.className = 'fas fa-copy text-slate-400 group-hover:text-white transition-colors';
+                        btn.classList.remove('border-emerald-500/50', 'bg-emerald-500/10');
+                    }, 2000);
+                };
+
+                navigator.clipboard.writeText(code).then(successUI).catch(() => {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = code; document.body.appendChild(textarea);
+                    textarea.select(); document.execCommand('copy');
+                    document.body.removeChild(textarea); successUI();
+                });
+            },
+
+            downloadLongImage: async (title) => {
+                const btn = document.getElementById('pdfBtn');
+                const originalHtml = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                btn.disabled = true;
+
+                const element = document.getElementById('notes-export-area');
+                
+                try {
+                    // Optimized scale (1.5) & JPEG compression (0.88) for sharp readability and compact file size
+                    const canvas = await html2canvas(element, {
+                        scale: 1.5,
+                        useCORS: true,
+                        backgroundColor: '#060913',
+                        logging: false,
+                        windowWidth: Math.min(element.scrollWidth + 60, 1000)
+                    });
+
+                    const imageData = canvas.toDataURL('image/jpeg', 0.88);
+                    const link = document.createElement('a');
+                    link.download = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_note.jpg`;
+                    link.href = imageData;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+
+                    btn.innerHTML = '<i class="fas fa-check text-white"></i> Saved!';
+                    setTimeout(() => {
+                        btn.innerHTML = originalHtml;
+                        btn.disabled = false;
+                    }, 1800);
+                } catch (err) {
+                    console.error("Image Export Error:", err);
+                    btn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Error';
+                    setTimeout(() => {
+                        btn.innerHTML = originalHtml;
+                        btn.disabled = false;
+                    }, 2000);
+                }
+            },
+
+            handleSearch: (query) => {
+                if (query.trim().length < 2) {
+                    elements.searchResults.classList.add('hidden');
+                    return;
+                }
+                const lowercaseQuery = query.toLowerCase();
+                const results = state.fullTree.filter(item => {
+                    const formattedName = utils.formatName(item.path).toLowerCase();
+                    return formattedName.includes(lowercaseQuery) || item.path.toLowerCase().includes(lowercaseQuery);
+                }).slice(0, 8); 
+
+                if (results.length === 0) {
+                    elements.searchResults.innerHTML = `<div class="p-6 text-center text-slate-400 font-medium">No material found</div>`;
+                } else {
+                    let html = '<ul class="py-2">';
+                    results.forEach(item => {
+                        const isFolder = item.type === 'tree';
+                        const details = isFolder ? utils.getFileDetails('folder') : utils.getFileDetails(item.path);
+                        const parts = item.path.split('/');
+                        const rawName = parts.pop();
+                        const name = utils.formatName(rawName);
+                        const parent = parts.join(' / ').replace(/[-_]/g, ' ');
+
+                        html += `
+                            <li>
+                                <button onclick="app.navigate('${item.path}')" class="w-full text-left px-5 py-4 hover:bg-white/5 transition flex items-center gap-4 focus:outline-none focus:bg-white/10 group active:bg-white/10" title="${rawName}">
+                                    <div class="w-10 h-10 rounded-xl ${details.bg} border ${details.border} flex flex-shrink-0 items-center justify-center">
+                                        <i class="${details.icon} ${details.color} text-lg"></i>
+                                    </div>
+                                    <div class="overflow-hidden">
+                                        <div class="text-slate-200 font-bold text-base group-hover:text-white transition-colors truncate">${name}</div>
+                                        ${parent ? `<div class="text-xs text-slate-500 mt-1 truncate">${parent}</div>` : ''}
+                                    </div>
+                                </button>
+                            </li>
+                        `;
+                    });
+                    html += '</ul>';
+                    elements.searchResults.innerHTML = html;
+                }
+                elements.searchResults.classList.remove('hidden');
+            }
+        };
+
+        // --- UI Feedback Components ---
+        function renderLoading(message) {
+            elements.container.className = "relative min-h-[500px]";
+            elements.container.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-36 animate-fade-in">
+                    <div class="professional-loader mb-6">
+                        <i class="fab fa-python text-accent-400 text-lg animate-pulse"></i>
+                    </div>
+                    <p class="text-white font-bold tracking-wide text-center px-4 text-base">${message}</p>
+                    <p class="text-slate-400 text-xs mt-1.5 animate-pulse">Please wait while content is loading...</p>
+                </div>
+            `;
+        }
+
+        function renderError(message) {
+            elements.container.innerHTML = `
+                <div class="glass-panel border-red-500/30 rounded-3xl p-10 sm:p-14 text-center max-w-2xl mx-auto mt-16 animate-slide-up relative overflow-hidden shadow-2xl shadow-red-500/10">
+                    <div class="absolute inset-0 bg-red-500/5"></div>
+                    <div class="relative z-10">
+                        <div class="w-16 h-16 bg-red-500/10 rounded-2xl border border-red-500/20 flex items-center justify-center mx-auto mb-6">
+                            <i class="fas fa-exclamation-triangle text-3xl text-red-400 shadow-sm"></i>
+                        </div>
+                        <h3 class="text-2xl font-extrabold text-white mb-3">Connection Error</h3>
+                        <p class="text-slate-400 mb-8 text-base">${message}</p>
+                        <button onclick="initApp()" class="px-8 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl transition-all text-base font-bold border border-white/10 flex items-center gap-3 mx-auto active:scale-95 hover:shadow-lg">
+                            <i class="fas fa-sync-alt"></i> Retry Connection
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderEmptyFolder() {
+            elements.container.innerHTML = `
+                <div class="glass-panel rounded-3xl p-16 sm:p-20 text-center max-w-2xl mx-auto mt-16 border-white/5 animate-slide-up shadow-2xl">
+                    <div class="w-24 h-24 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-8 border border-white/10 shadow-inner">
+                        <i class="fas fa-folder-open text-5xl text-slate-600"></i>
+                    </div>
+                    <h3 class="text-3xl font-extrabold text-white mb-3">Empty Directory</h3>
+                    <p class="text-slate-400 text-lg">Nothing to see here right now.</p>
+                </div>
+            `;
+        }
+
+        // --- Global Events ---
+        elements.searchInput.addEventListener('input', (e) => app.handleSearch(e.target.value));
+        document.addEventListener('click', (e) => {
+            if (!elements.searchInput.contains(e.target) && !elements.searchResults.contains(e.target)) {
+                elements.searchResults.classList.add('hidden');
+            }
+        });
+        elements.searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') { elements.searchResults.classList.add('hidden'); elements.searchInput.blur(); }
+        });
+
+        window.addEventListener('DOMContentLoaded', initApp);
+
+        // --- Register Service Worker ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(() => {
+                        console.log('Service Worker registered successfully.');
+                    })
+                    .catch((error) => {
+                        console.error('Service Worker registration failed:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>
