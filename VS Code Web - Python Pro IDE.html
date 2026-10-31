@@ -1,0 +1,1715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VS Code Web - Python Pro IDE</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome (VS Code Icons Simulation) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- CodeMirror for the Editor -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/darcula.min.css">
+
+    <!-- Pyodide (Python WebAssembly Engine) -->
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        vsc: {
+                            bg: '#1e1e1e',          
+                            activity: '#181818',    
+                            sidebar: '#252526',     
+                            sidebarHover: '#2a2d2e',
+                            sidebarActive: '#37373d',
+                            tab: '#2d2d2d',         
+                            tabInactive: '#1e1e1e', 
+                            border: '#2b2b2b',
+                            blue: '#007acc',        
+                            blueHover: '#005f9e',
+                            text: '#cccccc',        
+                            muted: '#858585',       
+                            terminal: '#181818',
+                            error: '#f14c4c',
+                            success: '#89d185',
+                            warn: '#cca700',
+                            badge: '#4d4d4d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body, html {
+            margin: 0; padding: 0;
+            height: 100vh; width: 100vw;
+            background-color: #1e1e1e;
+            color: #cccccc;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* Resizers */
+        .resizer-vertical {
+            width: 4px; background-color: transparent;
+            cursor: col-resize; z-index: 20;
+            transition: background-color 0.15s;
+        }
+        .resizer-vertical:hover, .resizer-vertical:active { background-color: #007acc; }
+
+        .resizer-horizontal {
+            height: 4px; background-color: transparent;
+            cursor: row-resize; z-index: 20;
+            transition: background-color 0.15s;
+        }
+        .resizer-horizontal:hover, .resizer-horizontal:active { background-color: #007acc; }
+
+        /* Clean Scrollbars */
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(121, 121, 121, 0.3); border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(121, 121, 121, 0.5); }
+
+        /* CodeMirror Overrides */
+        .CodeMirror {
+            height: 100% !important;
+            font-family: 'JetBrains Mono', monospace !important;
+            font-size: 14px;
+            line-height: 1.5;
+            background-color: #1e1e1e !important;
+            user-select: text;
+        }
+        .CodeMirror-gutters { background-color: #1e1e1e !important; border-right: 1px solid #2b2b2b !important; padding-right: 6px; }
+        .CodeMirror-linenumber { color: #6e7681 !important; }
+        .CodeMirror-cursor { border-left: 2px solid #007acc !important; }
+        .CodeMirror-selected { background: #264f78 !important; }
+
+        /* File Explorer Items */
+        .file-item {
+            display: flex; align-items: center; padding: 5px 12px 5px 20px;
+            cursor: pointer; font-size: 13px; border-left: 2px solid transparent;
+            transition: background-color 0.1s;
+        }
+        .file-item:hover { background-color: #2a2d2e; }
+        .file-item.active { background-color: #37373d; color: #ffffff; border-left-color: #007acc; }
+
+        /* Editor Tabs */
+        .editor-tab {
+            display: flex; align-items: center; gap: 8px;
+            padding: 0 14px; cursor: pointer; font-size: 13px;
+            background-color: #2d2d2d; color: #969696;
+            border-right: 1px solid #252526;
+            border-top: 2px solid transparent;
+            height: 35px; flex-shrink: 0;
+            transition: background-color 0.1s;
+        }
+        .editor-tab:hover { background-color: #252526; color: #cccccc; }
+        .editor-tab.active {
+            background-color: #1e1e1e; color: #ffffff;
+            border-top: 2px solid #007acc;
+        }
+        .editor-tab .close-btn { opacity: 0; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; border-radius: 4px; }
+        .editor-tab:hover .close-btn, .editor-tab.active .close-btn { opacity: 0.7; }
+        .editor-tab .close-btn:hover { opacity: 1; background-color: #3c3c3c; }
+
+        /* Terminal Styling */
+        #terminal-output { white-space: pre-wrap; word-wrap: break-word; outline: none; user-select: text; line-height: 1.45; }
+        .term-prompt { color: #4ec9b0; font-weight: 600; }
+        .term-path { color: #569cd6; font-weight: 600; }
+        .term-input { background: transparent; border: none; color: #d4d4d4; outline: none; flex: 1; font-family: inherit; font-size: inherit; }
+        .term-error { color: #f48771; }
+        .term-sys { color: #dcdcaa; }
+        .term-success { color: #89d185; }
+        .term-info { color: #9cdcfe; }
+
+        /* Activity Bar Button */
+        .act-btn {
+            width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;
+            color: #858585; position: relative; transition: color 0.15s;
+        }
+        .act-btn:hover { color: #ffffff; }
+        .act-btn.active { color: #ffffff; }
+        .act-btn.active::before {
+            content: ''; position: absolute; left: 0; top: 10px; bottom: 10px;
+            width: 2px; background-color: #007acc; border-radius: 0 2px 2px 0;
+        }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade { animation: fadeIn 0.15s ease-out forwards; }
+    </style>
+</head>
+<body class="flex flex-col text-vsc-text">
+
+    <!-- Top Titlebar -->
+    <header class="h-9 bg-vsc-activity flex items-center justify-between px-3 border-b border-vsc-border flex-shrink-0 z-30">
+        <!-- Left Menu & Brand -->
+        <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 text-vsc-blue font-semibold text-xs pl-1">
+                <i class="fab fa-python text-base"></i>
+                <span class="text-gray-200 font-medium tracking-tight">VS Code Python</span>
+                <span class="text-[10px] bg-vsc-blue/20 text-vsc-blue px-1.5 py-0.5 rounded font-mono">PRO</span>
+            </div>
+            <div class="hidden md:flex items-center gap-1 text-xs text-vsc-muted ml-2">
+                <button onclick="ide.openModal('newFile')" class="hover:bg-vsc-sidebarHover hover:text-white px-2 py-1 rounded">New File</button>
+                <button onclick="ide.openCommandPalette()" class="hover:bg-vsc-sidebarHover hover:text-white px-2 py-1 rounded">Packages</button>
+                <button onclick="ide.loadTemplate('numpy_demo')" class="hover:bg-vsc-sidebarHover hover:text-white px-2 py-1 rounded">NumPy Demo</button>
+                <button onclick="ide.loadTemplate('plot_demo')" class="hover:bg-vsc-sidebarHover hover:text-white px-2 py-1 rounded">Matplotlib Demo</button>
+            </div>
+        </div>
+
+        <!-- Center Command Search Bar -->
+        <div onclick="ide.openCommandPalette()" class="hidden sm:flex items-center gap-2 bg-vsc-sidebar hover:bg-vsc-sidebarHover border border-vsc-border px-3 py-1 rounded-md w-72 lg:w-96 cursor-pointer text-xs text-vsc-muted justify-between transition-colors">
+            <div class="flex items-center gap-2 truncate">
+                <i class="fas fa-search text-[11px]"></i>
+                <span class="truncate">Search commands or pip install...</span>
+            </div>
+            <kbd class="text-[10px] bg-vsc-activity px-1.5 py-0.5 rounded border border-vsc-border text-gray-400">Ctrl+K</kbd>
+        </div>
+
+        <!-- Right Action Controls -->
+        <div class="flex items-center gap-2 text-xs">
+            <button onclick="ide.runCode()" id="btn-run" class="bg-[#2ea043] hover:bg-[#3fb950] text-white px-3 py-1 rounded flex items-center gap-1.5 font-medium shadow-sm transition-colors" title="Run Python File (Ctrl+Enter)">
+                <i class="fas fa-play text-[10px]"></i> <span>Run</span>
+            </button>
+            <button onclick="ide.stopExecution()" id="btn-stop" class="bg-vsc-sidebar hover:bg-vsc-error hover:text-white px-2.5 py-1 rounded flex items-center gap-1.5 text-vsc-error border border-vsc-border disabled:opacity-40 disabled:pointer-events-none transition-colors" disabled title="Stop Execution">
+                <i class="fas fa-stop text-[10px]"></i>
+            </button>
+            <button onclick="ide.toggleFullscreen()" class="hover:bg-vsc-sidebarHover text-vsc-muted hover:text-white p-1.5 rounded transition-colors" title="Toggle Fullscreen">
+                <i class="fas fa-expand"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Workspace Area -->
+    <div class="flex flex-1 overflow-hidden relative">
+        
+        <!-- Far Left Activity Bar -->
+        <aside class="w-12 bg-vsc-activity flex flex-col items-center justify-between py-1 flex-shrink-0 z-20 border-r border-vsc-border">
+            <div class="flex flex-col w-full items-center">
+                <button onclick="ide.switchSidebarView('explorer')" class="act-btn active" id="act-explorer" title="File Explorer">
+                    <i class="far fa-copy text-lg"></i>
+                </button>
+                <button onclick="ide.switchSidebarView('packages')" class="act-btn" id="act-packages" title="Python Packages & Modules (PyPI)">
+                    <i class="fas fa-cubes text-lg"></i>
+                    <span id="pkg-badge" class="absolute top-2 right-1.5 bg-vsc-blue text-white text-[9px] font-bold px-1 rounded-full hidden">0</span>
+                </button>
+                <button onclick="ide.switchSidebarView('snippets')" class="act-btn" id="act-snippets" title="Templates & Demos">
+                    <i class="fas fa-flask text-lg"></i>
+                </button>
+            </div>
+            <div class="flex flex-col w-full items-center pb-1">
+                <button onclick="ide.openCommandPalette()" class="act-btn" title="Command Palette (Ctrl+K)">
+                    <i class="fas fa-terminal text-sm"></i>
+                </button>
+                <button onclick="ide.openModal('about')" class="act-btn" title="System Info">
+                    <i class="fas fa-cog text-lg"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Dynamic Sidebar -->
+        <div id="sidebar" class="w-64 bg-vsc-sidebar flex flex-col flex-shrink-0 overflow-hidden border-r border-vsc-border select-none">
+            
+            <!-- VIEW 1: FILE EXPLORER -->
+            <div id="view-explorer" class="flex flex-col h-full">
+                <div class="px-4 py-2.5 text-[11px] font-semibold text-vsc-muted flex justify-between items-center tracking-wider uppercase">
+                    <span>Explorer</span>
+                    <div class="flex gap-2">
+                        <button onclick="ide.openModal('newFile')" title="New File" class="hover:text-white"><i class="fas fa-file-plus"></i></button>
+                        <button onclick="document.getElementById('file-upload').click()" title="Upload .py File" class="hover:text-white"><i class="fas fa-file-upload"></i></button>
+                        <button onclick="ide.downloadCurrentFile()" title="Download Active File" class="hover:text-white"><i class="fas fa-download"></i></button>
+                        <button onclick="ide.openModal('resetProject')" title="Reset Workspace" class="hover:text-vsc-error"><i class="fas fa-trash-alt"></i></button>
+                        <input type="file" id="file-upload" accept=".py,.txt,.json,.csv" class="hidden" onchange="ide.handleFileUpload(event)">
+                    </div>
+                </div>
+                
+                <div class="flex items-center justify-between px-3 py-1.5 bg-vsc-sidebarActive/50 text-xs font-semibold text-gray-200 border-y border-vsc-border">
+                    <div class="flex items-center gap-1.5">
+                        <i class="fas fa-chevron-down text-[10px]"></i>
+                        <span>PYTHON-WORKSPACE</span>
+                    </div>
+                    <button onclick="ide.openModal('newFile')" class="text-[11px] bg-vsc-blue hover:bg-vsc-blueHover text-white px-1.5 py-0.5 rounded flex items-center gap-1">
+                        <i class="fas fa-plus text-[9px]"></i> File
+                    </button>
+                </div>
+
+                <!-- File List -->
+                <div id="file-list" class="flex-1 overflow-y-auto py-1"></div>
+
+                <!-- Quick Tip Footer -->
+                <div class="p-3 border-t border-vsc-border bg-vsc-activity/40 text-[11px] text-vsc-muted leading-relaxed">
+                    <div class="text-gray-300 font-medium mb-1"><i class="fas fa-lightbulb text-vsc-warn mr-1"></i> Multi-File Support</div>
+                    Files saved here are synced to the Python Virtual FS. You can <code class="text-vsc-blue">import utils</code> directly!
+                </div>
+            </div>
+
+            <!-- VIEW 2: PACKAGE MANAGER (PIP / PYPI) -->
+            <div id="view-packages" class="hidden flex-col h-full">
+                <div class="px-4 py-2.5 text-[11px] font-semibold text-vsc-muted flex justify-between items-center tracking-wider uppercase border-b border-vsc-border">
+                    <span>Python Packages (PyPI)</span>
+                    <button onclick="ide.refreshPackagesUI()" title="Refresh List" class="hover:text-white"><i class="fas fa-sync-alt"></i></button>
+                </div>
+
+                <!-- Search / Install Input -->
+                <div class="p-3 border-b border-vsc-border bg-vsc-activity/30">
+                    <label class="text-[11px] text-gray-400 block mb-1.5">Install via Micropip / PyPI</label>
+                    <div class="flex gap-1.5">
+                        <input type="text" id="pkg-search-input" placeholder="e.g. numpy, requests..." class="bg-vsc-bg border border-vsc-border focus:border-vsc-blue rounded px-2.5 py-1.5 text-xs text-white flex-1 outline-none font-mono" onkeydown="if(event.key==='Enter') ide.installFromSidebar()">
+                        <button onclick="ide.installFromSidebar()" id="btn-sidebar-install" class="bg-vsc-blue hover:bg-vsc-blueHover text-white px-3 py-1.5 rounded text-xs font-medium transition-colors">
+                            Install
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-3 space-y-4">
+                    <!-- Installed Packages Section -->
+                    <div>
+                        <div class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2 flex items-center justify-between">
+                            <span>Installed in Environment</span>
+                            <span id="installed-count" class="bg-vsc-badge text-white text-[10px] px-1.5 py-0.2 rounded-full">0</span>
+                        </div>
+                        <div id="installed-pkg-list" class="space-y-1 text-xs">
+                            <div class="text-vsc-muted italic text-[11px]">No extra packages installed yet.</div>
+                        </div>
+                    </div>
+
+                    <!-- Popular Data Science & Utility Packages -->
+                    <div>
+                        <div class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2">
+                            One-Click Popular Modules
+                        </div>
+                        <div id="popular-pkg-list" class="space-y-1.5">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 3: TEMPLATES & DEMOS -->
+            <div id="view-snippets" class="hidden flex-col h-full">
+                <div class="px-4 py-2.5 text-[11px] font-semibold text-vsc-muted tracking-wider uppercase border-b border-vsc-border">
+                    <span>Ready-to-Run Templates</span>
+                </div>
+                <div class="p-3 space-y-2 overflow-y-auto flex-1">
+                    <div onclick="ide.loadTemplate('numpy_demo')" class="p-2.5 rounded bg-vsc-activity hover:bg-vsc-sidebarHover border border-vsc-border cursor-pointer transition-colors">
+                        <div class="text-xs font-semibold text-white flex items-center justify-between">
+                            <span><i class="fas fa-th text-vsc-blue mr-1.5"></i> NumPy Matrix & Math</span>
+                            <span class="text-[10px] text-vsc-success">Auto-loads</span>
+                        </div>
+                        <p class="text-[11px] text-vsc-muted mt-1">Linear algebra, random arrays, mean & standard deviation calculation.</p>
+                    </div>
+
+                    <div onclick="ide.loadTemplate('plot_demo')" class="p-2.5 rounded bg-vsc-activity hover:bg-vsc-sidebarHover border border-vsc-border cursor-pointer transition-colors">
+                        <div class="text-xs font-semibold text-white flex items-center justify-between">
+                            <span><i class="fas fa-chart-line text-pink-400 mr-1.5"></i> Matplotlib Visual Plot</span>
+                            <span class="text-[10px] text-vsc-success">Visual Graph</span>
+                        </div>
+                        <p class="text-[11px] text-vsc-muted mt-1">Generates a high-res chart and renders it inside the Plots Viewer tab.</p>
+                    </div>
+
+                    <div onclick="ide.loadTemplate('pandas_demo')" class="p-2.5 rounded bg-vsc-activity hover:bg-vsc-sidebarHover border border-vsc-border cursor-pointer transition-colors">
+                        <div class="text-xs font-semibold text-white flex items-center justify-between">
+                            <span><i class="fas fa-table text-amber-400 mr-1.5"></i> Pandas DataFrame Analysis</span>
+                            <span class="text-[10px] text-vsc-success">Data Science</span>
+                        </div>
+                        <p class="text-[11px] text-vsc-muted mt-1">Creates a dataset, filters records, and prints statistical summaries.</p>
+                    </div>
+
+                    <div onclick="ide.loadTemplate('multifile_demo')" class="p-2.5 rounded bg-vsc-activity hover:bg-vsc-sidebarHover border border-vsc-border cursor-pointer transition-colors">
+                        <div class="text-xs font-semibold text-white flex items-center justify-between">
+                            <span><i class="fas fa-project-diagram text-purple-400 mr-1.5"></i> Multi-File Module Import</span>
+                            <span class="text-[10px] text-vsc-blue">2 Files</span>
+                        </div>
+                        <p class="text-[11px] text-vsc-muted mt-1">Creates <code class="text-gray-300">math_helper.py</code> and imports it inside <code class="text-gray-300">main.py</code>.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Sidebar Vertical Resizer -->
+        <div class="resizer-vertical" id="resizer-sidebar"></div>
+
+        <!-- Center & Bottom: Editor + Terminal / Output -->
+        <div class="flex-1 flex flex-col min-w-[320px] overflow-hidden bg-vsc-bg relative">
+            
+            <!-- Code Editor Section -->
+            <div class="flex-1 flex flex-col min-h-[120px] relative">
+                <!-- Tab Bar -->
+                <div class="flex bg-vsc-sidebar overflow-x-auto h-[35px] flex-shrink-0 border-b border-vsc-border" id="editor-tabs"></div>
+                
+                <!-- Breadcrumbs & Quick Actions -->
+                <div class="h-6 bg-vsc-bg flex items-center justify-between px-4 text-xs text-vsc-muted border-b border-vsc-border select-none">
+                    <div class="flex items-center">
+                        <span>workspace</span>
+                        <i class="fas fa-chevron-right text-[9px] mx-2"></i>
+                        <span class="text-gray-300 font-medium flex items-center gap-1.5">
+                            <i class="fab fa-python text-vsc-blue"></i>
+                            <span id="bc-filename">main.py</span>
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-3 text-[11px]">
+                        <button onclick="ide.formatCode()" class="hover:text-white flex items-center gap-1" title="Clean Indentation">
+                            <i class="fas fa-magic"></i> Format
+                        </button>
+                        <button onclick="ide.copyCode()" class="hover:text-white flex items-center gap-1" title="Copy Code">
+                            <i class="far fa-copy"></i> <span id="copy-label">Copy</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- CodeMirror Container -->
+                <div class="flex-1 relative overflow-hidden">
+                    <textarea id="code-editor"></textarea>
+                </div>
+            </div>
+
+            <!-- Terminal Horizontal Resizer -->
+            <div class="resizer-horizontal" id="resizer-terminal"></div>
+
+            <!-- Bottom Panel (Terminal, Plots, Installed Modules) -->
+            <div id="bottom-panel" class="h-64 bg-vsc-terminal flex flex-col flex-shrink-0 border-t border-vsc-border">
+                <!-- Panel Navigation Bar -->
+                <div class="flex items-center justify-between px-4 h-8 bg-vsc-sidebar border-b border-vsc-border select-none text-xs">
+                    <div class="flex items-center gap-5 h-full">
+                        <button onclick="ide.switchBottomTab('terminal')" id="btab-terminal" class="h-full border-b-2 border-vsc-blue text-white font-medium uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                            <i class="fas fa-terminal text-[10px]"></i> Terminal
+                        </button>
+                        <button onclick="ide.switchBottomTab('plots')" id="btab-plots" class="h-full border-b-2 border-transparent text-vsc-muted hover:text-white font-medium uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                            <i class="fas fa-chart-bar text-[10px]"></i> Plots & Visuals
+                            <span id="plot-badge" class="bg-pink-600 text-white text-[9px] px-1.5 rounded-full hidden">New</span>
+                        </button>
+                        <button onclick="ide.switchBottomTab('env')" id="btab-env" class="h-full border-b-2 border-transparent text-vsc-muted hover:text-white font-medium uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                            <i class="fas fa-microchip text-[10px]"></i> Variables & Inspector
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center gap-3 text-vsc-muted">
+                        <span class="text-[11px] font-mono hidden sm:inline text-gray-400" id="term-shell-label">bash / pip / python</span>
+                        <button onclick="ide.clearTerminal()" class="hover:text-white p-1" title="Clear Terminal (Ctrl+L)"><i class="fas fa-ban"></i></button>
+                        <button onclick="ide.toggleMaximizeTerminal()" class="hover:text-white p-1" title="Maximize/Restore Panel"><i class="fas fa-chevron-up" id="term-max-icon"></i></button>
+                        <button onclick="ide.toggleTerminal()" class="hover:text-white p-1" title="Hide Panel"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+                
+                <!-- TAB 1: Interactive Terminal -->
+                <div id="bview-terminal" class="flex-1 p-3 font-mono text-[13px] overflow-y-auto cursor-text" onclick="ide.focusTerminal()">
+                    <div id="terminal-output" class="w-full"></div>
+                    <div id="terminal-input-container" class="flex items-center gap-2 mt-1">
+                        <span id="terminal-prompt-label" class="term-prompt">user@vscode<span class="text-white">:</span><span class="term-path">~/workspace</span>$</span>
+                        <input type="text" id="terminal-input" class="term-input" autocomplete="off" spellcheck="false" placeholder="Type help, pip install numpy, python main.py, or python code...">
+                    </div>
+                </div>
+
+                <!-- TAB 2: Matplotlib & Image Plots Output -->
+                <div id="bview-plots" class="hidden flex-1 p-4 overflow-y-auto bg-[#141414] flex flex-col items-center justify-center relative">
+                    <div id="plots-empty" class="text-center text-vsc-muted text-xs">
+                        <i class="fas fa-chart-area text-3xl mb-2 opacity-40"></i>
+                        <p>No plots generated yet.</p>
+                        <p class="text-[11px] mt-1">Use <code class="text-vsc-blue">matplotlib.pyplot</code> and call <code class="text-vsc-blue">plt.show()</code> to render charts here.</p>
+                    </div>
+                    <div id="plots-gallery" class="hidden w-full h-full flex flex-wrap gap-4 items-start justify-center overflow-y-auto p-2"></div>
+                </div>
+
+                <!-- TAB 3: Environment Variables Inspector -->
+                <div id="bview-env" class="hidden flex-1 p-3 overflow-y-auto font-mono text-xs">
+                    <div class="flex justify-between items-center mb-2 pb-1 border-b border-vsc-border">
+                        <span class="text-gray-400 font-sans font-semibold uppercase text-[11px]">Active Global Variables in Python Session</span>
+                        <button onclick="ide.inspectGlobals()" class="text-vsc-blue hover:underline text-[11px] font-sans"><i class="fas fa-sync-alt mr-1"></i>Refresh</button>
+                    </div>
+                    <div id="env-vars-list" class="space-y-1 text-gray-300">
+                        <div class="text-vsc-muted italic">Run a script to inspect live Python variables.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bottom Status Bar -->
+    <footer class="h-6 bg-vsc-blue text-white flex items-center justify-between px-3 text-[11px] select-none flex-shrink-0 z-30">
+        <div class="flex items-center gap-3 h-full">
+            <div class="flex items-center gap-1.5 font-medium">
+                <i class="fas fa-code-branch text-[10px]"></i>
+                <span>main*</span>
+            </div>
+            <div id="engine-status" class="flex items-center gap-1.5 bg-black/20 px-2 py-0.5 rounded">
+                <i class="fas fa-circle-notch fa-spin text-[10px]"></i>
+                <span>Booting Python 3.11 WASM...</span>
+            </div>
+            <div id="pkg-working-indicator" class="hidden items-center gap-1.5 bg-amber-500/90 text-black font-semibold px-2 py-0.5 rounded">
+                <i class="fas fa-download fa-bounce text-[10px]"></i>
+                <span id="pkg-working-text">Installing package...</span>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-4 text-white/90 h-full">
+            <button onclick="ide.switchSidebarView('packages')" class="hover:bg-white/10 px-1.5 h-full flex items-center gap-1" title="Manage Packages">
+                <i class="fas fa-box-open text-[10px]"></i>
+                <span id="status-pkg-count">0 Packages</span>
+            </button>
+            <div id="cursor-position" class="hover:bg-white/10 px-1.5 h-full flex items-center">Ln 1, Col 1</div>
+            <div class="hidden sm:flex items-center">UTF-8</div>
+            <div class="flex items-center gap-1 font-semibold">
+                <i class="fab fa-python"></i> Python 3.11 (Pyodide)
+            </div>
+        </div>
+    </footer>
+
+    <!-- UNIVERSAL CUSTOM MODAL (Replaces alert, confirm, prompt) -->
+    <div id="custom-modal" class="fixed inset-0 bg-black/60 backdrop-blur-[1px] z-50 hidden items-center justify-center p-4">
+        <div class="bg-vsc-sidebar border border-vsc-border rounded-lg shadow-2xl w-full max-w-md overflow-hidden animate-fade">
+            <div class="px-4 py-3 bg-vsc-activity border-b border-vsc-border flex justify-between items-center">
+                <h3 id="modal-title" class="text-xs font-semibold text-white uppercase tracking-wider">Action</h3>
+                <button onclick="ide.closeModal()" class="text-vsc-muted hover:text-white"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="modal-body" class="p-4 text-xs text-gray-300 space-y-3"></div>
+            <div id="modal-footer" class="px-4 py-2.5 bg-vsc-activity/60 border-t border-vsc-border flex justify-end gap-2 text-xs"></div>
+        </div>
+    </div>
+
+    <!-- COMMAND PALETTE MODAL (Ctrl+K / Ctrl+Shift+P) -->
+    <div id="command-palette" class="fixed inset-0 bg-black/50 z-50 hidden items-start justify-center pt-14 p-4" onclick="if(event.target===this) ide.closeCommandPalette()">
+        <div class="bg-vsc-sidebar border border-vsc-border rounded-lg shadow-2xl w-full max-w-xl overflow-hidden animate-fade">
+            <div class="p-2 border-b border-vsc-border flex items-center gap-2 bg-vsc-bg">
+                <i class="fas fa-chevron-right text-vsc-blue text-xs pl-2"></i>
+                <input type="text" id="cp-input" placeholder="Type a command or 'pip install <package>'..." class="w-full bg-transparent text-xs text-white outline-none py-1 font-mono" oninput="ide.filterCommandPalette()">
+                <kbd class="text-[10px] text-vsc-muted px-1.5 py-0.5 bg-vsc-sidebar rounded border border-vsc-border">ESC</kbd>
+            </div>
+            <div id="cp-results" class="max-h-72 overflow-y-auto divide-y divide-vsc-border/40 text-xs"></div>
+        </div>
+    </div>
+
+    <!-- CodeMirror Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/closebrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/addon/edit/matchbrackets.min.js"></script>
+
+    <script>
+        // Popular packages curated for Pyodide / WASM support
+        const POPULAR_PACKAGES = [
+            { name: 'numpy', desc: 'Fundamental package for array computing & matrices', icon: 'fa-th' },
+            { name: 'pandas', desc: 'Powerful data structures & DataFrame analysis', icon: 'fa-table' },
+            { name: 'matplotlib', desc: 'Comprehensive 2D plotting & graph visualization', icon: 'fa-chart-pie' },
+            { name: 'scipy', desc: 'Scientific computing, calculus & signal processing', icon: 'fa-atom' },
+            { name: 'scikit-learn', desc: 'Machine learning & predictive data analysis', icon: 'fa-brain' },
+            { name: 'sympy', desc: 'Symbolic mathematics & algebra computer system', icon: 'fa-square-root-alt' },
+            { name: 'networkx', desc: 'Complex networks & graph theory algorithms', icon: 'fa-project-diagram' },
+            { name: 'beautifulsoup4', desc: 'HTML and XML parsing library', icon: 'fa-code' },
+            { name: 'pyyaml', desc: 'YAML parser and emitter for Python', icon: 'fa-file-alt' },
+            { name: 'faker', desc: 'Generate realistic fake data (names, emails, etc.)', icon: 'fa-user-secret' }
+        ];
+
+        const CODE_TEMPLATES = {
+            default: `# VS Code Python Pro Environment
+# Try terminal commands below:
+#   pip install numpy
+#   pip list
+#   python main.py
+
+import sys
+import platform
+
+print("🐍 Python Version:", sys.version.split()[0])
+print("💻 Platform:", platform.system(), platform.machine())
+print("-" * 42)
+
+# Interactive input test
+name = input("Enter your developer name: ")
+print(f"Welcome aboard, {name}! Ready to build.")
+`,
+            numpy_demo: `# NumPy Scientific Computing Demo
+# Auto-installs numpy if not already loaded!
+import numpy as np
+
+print("✅ NumPy Version:", np.__version__)
+
+# Create a 3x3 matrix and perform operations
+matrix = np.array([
+    [12, 24, 36],
+    [45, 55, 65],
+    [78, 88, 98]
+])
+
+print("\\n📊 Original 3x3 Matrix:")
+print(matrix)
+
+print("\\n⚡ Matrix Statistics:")
+print("• Mean Value     :", np.round(np.mean(matrix), 2))
+print("• Standard Dev   :", np.round(np.std(matrix), 2))
+print("• Determinant    :", np.round(np.linalg.det(matrix), 2))
+print("• Transpose      :\\n", matrix.T)
+`,
+            plot_demo: `# Matplotlib Graph Plotting Demo
+# Renders directly into the 'Plots & Visuals' tab below!
+import numpy as np
+import matplotlib.pyplot as plt
+
+x = np.linspace(0, 10, 200)
+y1 = np.sin(x)
+y2 = np.cos(x) * np.exp(-0.1 * x)
+
+plt.figure(figsize=(7, 4), dpi=110)
+plt.style.use('dark_background')
+
+plt.plot(x, y1, label='sin(x) Wave', color='#007acc', linewidth=2)
+plt.plot(x, y2, label='Damped cos(x)', color='#f14c4c', linestyle='--', linewidth=2)
+
+plt.title("VS Code Python - Live Signal Visualization", fontsize=12, pad=10)
+plt.xlabel("Time (seconds)")
+plt.ylabel("Amplitude")
+plt.grid(True, alpha=0.2)
+plt.legend()
+plt.tight_layout()
+
+print("🎨 Rendering plot to 'Plots & Visuals' tab...")
+plt.show()
+print("✅ Done! Check the Plots tab.")
+`,
+            pandas_demo: `# Pandas DataFrame Analytics Demo
+import pandas as pd
+import numpy as np
+
+data = {
+    'Developer': ['Aarav', 'Priya', 'Rohan', 'Neha', 'Vikram'],
+    'Role': ['AI Eng', 'Data Sci', 'Backend', 'ML Ops', 'Fullstack'],
+    'Commits': [142, 198, 115, 167, 89],
+    'Efficiency': [94.5, 98.2, 88.0, 95.1, 91.4]
+}
+
+df = pd.DataFrame(data)
+print("📋 Team Engineering DataFrame:")
+print(df.to_string(index=False))
+
+print("\\n🏆 Top Performers (Efficiency > 93%):")
+top = df[df['Efficiency'] > 93]
+print(top[['Developer', 'Role', 'Efficiency']].to_string(index=False))
+
+print("\\n📈 Summary Metrics:")
+print(f"Total Commits: {df['Commits'].sum()} | Avg Efficiency: {df['Efficiency'].mean():.2f}%")
+`
+        };
+
+        const state = {
+            files: {
+                'main.py': { content: CODE_TEMPLATES.default, modified: false },
+                'utils.py': { content: `# Helper module - You can import this in main.py!\ndef greet_user(user):\n    return f"Hello {user}, imported from utils.py!"\n\nPI_APPROX = 3.14159265\n`, modified: false }
+            },
+            activeFile: 'main.py',
+            pyodide: null,
+            installedPackages: new Map(), // name -> version
+            isRunning: false,
+            awaitingInput: null,
+            sidebarView: 'explorer',
+            bottomTab: 'terminal',
+            terminalVisible: true,
+            terminalMaximized: false,
+            cmdHistory: [],
+            cmdHistoryIdx: -1
+        };
+
+        const els = {
+            editor: document.getElementById('code-editor'),
+            fileList: document.getElementById('file-list'),
+            tabs: document.getElementById('editor-tabs'),
+            termOutput: document.getElementById('terminal-output'),
+            termInput: document.getElementById('terminal-input'),
+            termInputCont: document.getElementById('terminal-input-container'),
+            termPromptLabel: document.getElementById('terminal-prompt-label'),
+            termWrapper: document.getElementById('bview-terminal'),
+            cursorPos: document.getElementById('cursor-position'),
+            btnStop: document.getElementById('btn-stop'),
+            btnRun: document.getElementById('btn-run'),
+            engineStatus: document.getElementById('engine-status'),
+            bcFile: document.getElementById('bc-filename'),
+            sidebar: document.getElementById('sidebar'),
+            panel: document.getElementById('bottom-panel'),
+            pkgBadge: document.getElementById('pkg-badge'),
+            statusPkgCount: document.getElementById('status-pkg-count'),
+            pkgWorkingInd: document.getElementById('pkg-working-indicator'),
+            pkgWorkingText: document.getElementById('pkg-working-text'),
+            modal: document.getElementById('custom-modal'),
+            modalTitle: document.getElementById('modal-title'),
+            modalBody: document.getElementById('modal-body'),
+            modalFooter: document.getElementById('modal-footer'),
+            cpModal: document.getElementById('command-palette'),
+            cpInput: document.getElementById('cp-input'),
+            cpResults: document.getElementById('cp-results')
+        };
+
+        // Initialize CodeMirror
+        const editor = CodeMirror.fromTextArea(els.editor, {
+            mode: 'python',
+            theme: 'darcula',
+            lineNumbers: true,
+            indentUnit: 4,
+            tabSize: 4,
+            lineWrapping: false,
+            autoCloseBrackets: true,
+            matchBrackets: true,
+            extraKeys: {
+                "Ctrl-Enter": () => ide.runCode(),
+                "Cmd-Enter": () => ide.runCode(),
+                "Ctrl-S": () => ide.saveFile(),
+                "Cmd-S": () => ide.saveFile(),
+                "Ctrl-K": () => ide.openCommandPalette(),
+                "Cmd-K": () => ide.openCommandPalette(),
+                "Tab": (cm) => cm.replaceSelection("    ", "end")
+            }
+        });
+
+        editor.on('cursorActivity', () => {
+            const pos = editor.getCursor();
+            els.cursorPos.textContent = `Ln ${pos.line + 1}, Col ${pos.ch + 1}`;
+        });
+
+        editor.on('change', () => {
+            if (state.activeFile && state.files[state.activeFile]) {
+                const currentVal = editor.getValue();
+                if (state.files[state.activeFile].content !== currentVal) {
+                    state.files[state.activeFile].content = currentVal;
+                    state.files[state.activeFile].modified = true;
+                    ide.renderTabs();
+                    ide.syncFileToPyodideFS(state.activeFile, currentVal);
+                }
+            }
+        });
+
+        // Global Keyboard Shortcuts
+        window.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+                e.preventDefault();
+                ide.openCommandPalette();
+            } else if (e.key === 'Escape') {
+                ide.closeModal();
+                ide.closeCommandPalette();
+            } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'l') {
+                e.preventDefault();
+                ide.clearTerminal();
+            }
+        });
+
+        const ide = {
+            init: async () => {
+                ide.switchFile(state.activeFile);
+                ide.setupResizers();
+                ide.setupTerminal();
+                ide.renderPackagesSidebar();
+                
+                try {
+                    els.engineStatus.innerHTML = `<i class="fas fa-sync fa-spin"></i> Loading Python 3.11...`;
+                    
+                    state.pyodide = await loadPyodide({
+                        indexURL: "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/"
+                    });
+                    
+                    els.engineStatus.innerHTML = `<i class="fas fa-box-open"></i> Configuring pip & FS...`;
+                    await state.pyodide.loadPackage("micropip");
+
+                    // Sync all workspace files into Pyodide Virtual File System
+                    Object.keys(state.files).forEach(fn => {
+                        ide.syncFileToPyodideFS(fn, state.files[fn].content);
+                    });
+
+                    // Expose JS bridges to Python
+                    state.pyodide.globals.set("__js_print__", (msg, isErr) => {
+                        ide.printToTerminal(msg, isErr ? 'term-error' : 'normal');
+                    });
+                    state.pyodide.globals.set("__js_input__", async () => await ide.requestTerminalInput());
+                    state.pyodide.globals.set("__js_render_plot__", (b64) => ide.addPlotImage(b64));
+
+                    // Configure stdout, stderr, input() and matplotlib hook
+                    await state.pyodide.runPythonAsync(`
+import sys
+import builtins
+
+class _VSCodeStream:
+    def __init__(self, is_err=False):
+        self.is_err = is_err
+    def write(self, text):
+        if text:
+            __js_print__(str(text), self.is_err)
+    def flush(self):
+        pass
+
+sys.stdout = _VSCodeStream(False)
+sys.stderr = _VSCodeStream(True)
+
+async def _vscode_input(prompt=""):
+    if prompt:
+        __js_print__(str(prompt), False)
+    return await __js_input__()
+
+builtins.input = _vscode_input
+                    `);
+
+                    els.engineStatus.innerHTML = `<i class="fas fa-check-circle text-vsc-success"></i> Python 3.11 Ready`;
+                    ide.printToTerminal("╭──────────────────────────────────────────────────────────────╮\n", "term-info");
+                    ide.printToTerminal("│  VS Code Python Pro Terminal (Pyodide v0.25 + Micropip)      │\n", "term-info");
+                    ide.printToTerminal("│  Try: 'pip install numpy', 'pip list', 'python main.py'      │\n", "term-info");
+                    ide.printToTerminal("│  Type 'help' for all available terminal & shell commands.    │\n", "term-info");
+                    ide.printToTerminal("╰──────────────────────────────────────────────────────────────╯\n\n", "term-info");
+                } catch (error) {
+                    els.engineStatus.innerHTML = `<i class="fas fa-exclamation-triangle text-vsc-error"></i> Engine Failed`;
+                    ide.printToTerminal(`\nCritical Error initializing Python:\n${error.message}\n`, "term-error");
+                }
+            },
+
+            // Sync in-memory files with Pyodide's Emscripten Virtual FS so 'import otherfile' works seamlessly
+            syncFileToPyodideFS: (filename, content) => {
+                if (!state.pyodide) return;
+                try {
+                    state.pyodide.FS.writeFile(filename, content, { encoding: "utf8" });
+                } catch (e) {
+                    console.warn("FS Sync Error:", e);
+                }
+            },
+
+            // Detect imported modules in Python code and auto-install if needed
+            autoDetectAndInstallImports: async (code) => {
+                const importRegex = /^\s*(?:import|from)\s+([a-zA-Z0-9_]+)/gm;
+                const matches = new Set();
+                let match;
+                while ((match = importRegex.exec(code)) !== null) {
+                    matches.add(match[1]);
+                }
+
+                // Map import names to PyPI package names
+                const pkgMap = {
+                    'numpy': 'numpy',
+                    'pd': 'pandas',
+                    'pandas': 'pandas',
+                    'matplotlib': 'matplotlib',
+                    'plt': 'matplotlib',
+                    'scipy': 'scipy',
+                    'sklearn': 'scikit-learn',
+                    'sympy': 'sympy',
+                    'nx': 'networkx',
+                    'networkx': 'networkx',
+                    'bs4': 'beautifulsoup4',
+                    'yaml': 'pyyaml',
+                    'faker': 'faker'
+                };
+
+                for (const mod of matches) {
+                    // Skip if local workspace file exists
+                    if (state.files[`${mod}.py`]) continue;
+                    const targetPkg = pkgMap[mod];
+                    if (targetPkg && !state.installedPackages.has(targetPkg)) {
+                        ide.printToTerminal(`[Auto-Resolver] Detected '${mod}', installing '${targetPkg}'...\n`, 'term-sys');
+                        await ide.installPackage(targetPkg, true);
+                    }
+                }
+
+                // If matplotlib is installed and used, inject non-interactive PNG renderer hook for plt.show()
+                if (state.installedPackages.has('matplotlib') && (code.includes('matplotlib') || code.includes('plt'))) {
+                    await state.pyodide.runPythonAsync(`
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import io, base64
+
+def _custom_show(*args, **kwargs):
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png', bbox_inches='tight')
+    buf.seek(0)
+    b64 = base64.b64encode(buf.read()).decode('utf-8')
+    __js_render_plot__(b64)
+    plt.clf()
+
+plt.show = _custom_show
+                    `);
+                }
+            },
+
+            // Core Package Installer (Supports micropip & pyodide.loadPackage)
+            installPackage: async (pkgSpec, silent = false) => {
+                if (!state.pyodide) {
+                    ide.printToTerminal("Python engine is still loading. Please wait...\n", "term-error");
+                    return false;
+                }
+
+                const cleanName = pkgSpec.trim();
+                if (!cleanName) return false;
+
+                els.pkgWorkingInd.classList.remove('hidden');
+                els.pkgWorkingInd.classList.add('flex');
+                els.pkgWorkingText.textContent = `pip installing ${cleanName}...`;
+
+                if (!silent) {
+                    ide.printToTerminal(`Collecting ${cleanName} from PyPI / Pyodide CDN...\n`, 'term-sys');
+                }
+
+                try {
+                    const micropip = state.pyodide.pyimport("micropip");
+                    await micropip.install(cleanName);
+
+                    // Fetch installed version from micropip.list()
+                    const pkgListDict = micropip.list().toJs();
+                    pkgListDict.forEach((version, name) => {
+                        state.installedPackages.set(name.toLowerCase(), version);
+                    });
+                    if (!state.installedPackages.has(cleanName.toLowerCase())) {
+                        state.installedPackages.set(cleanName.toLowerCase(), 'latest');
+                    }
+
+                    const ver = state.installedPackages.get(cleanName.toLowerCase()) || 'latest';
+                    if (!silent) {
+                        ide.printToTerminal(`Successfully installed ${cleanName} (${ver})\n`, 'term-success');
+                    }
+
+                    ide.refreshPackagesUI();
+                    return true;
+                } catch (err) {
+                    ide.printToTerminal(`ERROR: Could not install '${cleanName}'.\nReason: ${err.message || err}\n`, 'term-error');
+                    return false;
+                } finally {
+                    els.pkgWorkingInd.classList.add('hidden');
+                    els.pkgWorkingInd.classList.remove('flex');
+                }
+            },
+
+            installFromSidebar: async () => {
+                const input = document.getElementById('pkg-search-input');
+                const pkg = input.value.trim();
+                if (!pkg) return;
+                input.value = '';
+                await ide.installPackage(pkg, false);
+            },
+
+            refreshPackagesUI: () => {
+                const count = state.installedPackages.size;
+                document.getElementById('installed-count').textContent = count;
+                els.statusPkgCount.textContent = `${count} Package${count === 1 ? '' : 's'}`;
+                
+                if (count > 0) {
+                    els.pkgBadge.textContent = count;
+                    els.pkgBadge.classList.remove('hidden');
+                } else {
+                    els.pkgBadge.classList.add('hidden');
+                }
+
+                const listEl = document.getElementById('installed-pkg-list');
+                if (count === 0) {
+                    listEl.innerHTML = `<div class="text-vsc-muted italic text-[11px]">No extra packages installed yet.</div>`;
+                } else {
+                    listEl.innerHTML = '';
+                    state.installedPackages.forEach((ver, name) => {
+                        const row = document.createElement('div');
+                        row.className = 'flex items-center justify-between bg-vsc-activity px-2.5 py-1.5 rounded border border-vsc-border';
+                        row.innerHTML = `
+                            <div class="flex items-center gap-2 truncate">
+                                <i class="fas fa-check-circle text-vsc-success text-[10px]"></i>
+                                <span class="font-mono text-gray-200 font-medium truncate">${name}</span>
+                            </div>
+                            <span class="text-[10px] font-mono bg-vsc-sidebar px-1.5 py-0.5 rounded text-vsc-info">${ver}</span>
+                        `;
+                        listEl.appendChild(row);
+                    });
+                }
+
+                ide.renderPackagesSidebar();
+            },
+
+            renderPackagesSidebar: () => {
+                const popEl = document.getElementById('popular-pkg-list');
+                popEl.innerHTML = '';
+
+                POPULAR_PACKAGES.forEach(pkg => {
+                    const isInstalled = state.installedPackages.has(pkg.name.toLowerCase());
+                    const card = document.createElement('div');
+                    card.className = 'p-2 rounded bg-vsc-activity/70 hover:bg-vsc-sidebarHover border border-vsc-border flex items-start justify-between gap-2 transition-colors';
+                    card.innerHTML = `
+                        <div class="min-w-0 flex-1">
+                            <div class="text-xs font-semibold text-gray-200 flex items-center gap-1.5">
+                                <i class="fas ${pkg.icon} text-vsc-blue text-[11px]"></i>
+                                <span class="font-mono">${pkg.name}</span>
+                            </div>
+                            <p class="text-[10px] text-vsc-muted truncate mt-0.5" title="${pkg.desc}">${pkg.desc}</p>
+                        </div>
+                        <button onclick="ide.installPackage('${pkg.name}')" 
+                            class="px-2 py-1 rounded text-[10px] font-medium flex-shrink-0 transition-colors ${isInstalled ? 'bg-vsc-success/20 text-vsc-success pointer-events-none' : 'bg-vsc-blue hover:bg-vsc-blueHover text-white'}">
+                            ${isInstalled ? 'Installed' : '+ Install'}
+                        </button>
+                    `;
+                    popEl.appendChild(card);
+                });
+            },
+
+            // Plot Gallery Handler
+            addPlotImage: (base64Data) => {
+                document.getElementById('plots-empty').classList.add('hidden');
+                const gallery = document.getElementById('plots-gallery');
+                gallery.classList.remove('hidden');
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'bg-vsc-sidebar border border-vsc-border rounded-lg p-2 shadow-lg max-w-full animate-fade';
+                wrapper.innerHTML = `
+                    <div class="flex justify-between items-center mb-1.5 px-1 text-[11px] text-gray-400">
+                        <span><i class="fas fa-image text-pink-400 mr-1"></i> Matplotlib Output (${new Date().toLocaleTimeString()})</span>
+                        <a href="data:image/png;base64,${base64Data}" download="plot.png" class="text-vsc-blue hover:underline"><i class="fas fa-download mr-1"></i>Save PNG</a>
+                    </div>
+                    <img src="data:image/png;base64,${base64Data}" class="max-h-60 rounded border border-vsc-border mx-auto" alt="Python Plot">
+                `;
+                gallery.prepend(wrapper);
+
+                // Show badge or auto-switch
+                document.getElementById('plot-badge').classList.remove('hidden');
+                ide.switchBottomTab('plots');
+            },
+
+            // Inspect Live Python Variables
+            inspectGlobals: async () => {
+                if (!state.pyodide) return;
+                try {
+                    const resJson = await state.pyodide.runPythonAsync(`
+import json
+_ignored = {'sys', 'builtins', '__builtins__', '__name__', '__doc__', '__package__', '__loader__', '__spec__', '__annotations__', '_VSCodeStream', '_vscode_input', '__js_print__', '__js_input__', '__js_render_plot__', 'json', '_ignored', 'io', 'base64', '_custom_show'}
+_vars = {}
+for k, v in list(globals().items()):
+    if not k.startswith('_') and k not in _ignored:
+        t = type(v).__name__
+        if t not in ('module', 'function', 'type'):
+            val_str = repr(v)
+            if len(val_str) > 80:
+                val_str = val_str[:77] + '...'
+            _vars[k] = {'type': t, 'value': val_str}
+json.dumps(_vars)
+                    `);
+                    const vars = JSON.parse(resJson);
+                    const container = document.getElementById('env-vars-list');
+                    const keys = Object.keys(vars);
+                    if (keys.length === 0) {
+                        container.innerHTML = `<div class="text-vsc-muted italic">No user variables found in global scope.</div>`;
+                        return;
+                    }
+                    container.innerHTML = '';
+                    keys.forEach(k => {
+                        const item = document.createElement('div');
+                        item.className = 'flex items-center justify-between bg-vsc-activity px-3 py-1.5 rounded border border-vsc-border';
+                        item.innerHTML = `
+                            <div class="flex items-center gap-2">
+                                <span class="text-vsc-info font-semibold">${k}</span>
+                                <span class="text-[10px] bg-vsc-sidebar px-1.5 py-0.2 rounded text-vsc-muted">${vars[k].type}</span>
+                            </div>
+                            <span class="text-vsc-success truncate max-w-md">${vars[k].value}</span>
+                        `;
+                        container.appendChild(item);
+                    });
+                } catch (e) {
+                    console.warn("Variable inspection failed:", e);
+                }
+            },
+
+            // File Management
+            saveFile: () => {
+                if (state.activeFile && state.files[state.activeFile]) {
+                    state.files[state.activeFile].modified = false;
+                    ide.syncFileToPyodideFS(state.activeFile, state.files[state.activeFile].content);
+                    ide.renderTabs();
+                    ide.renderSidebar();
+                }
+            },
+
+            switchFile: (filename) => {
+                if (!state.files[filename]) return;
+                state.activeFile = filename;
+                editor.setValue(state.files[filename].content);
+                state.files[filename].modified = false;
+                els.bcFile.textContent = filename;
+                ide.renderSidebar();
+                ide.renderTabs();
+            },
+
+            deleteFile: (filename, e) => {
+                if (e) e.stopPropagation();
+                if (Object.keys(state.files).length <= 1) {
+                    ide.openModal('info', { title: 'Cannot Delete', message: 'Workspace must contain at least one file.' });
+                    return;
+                }
+                ide.openModal('deleteFile', { filename });
+            },
+
+            downloadCurrentFile: () => {
+                const fn = state.activeFile;
+                const content = editor.getValue();
+                const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = fn;
+                a.click();
+            },
+
+            handleFileUpload: (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    const content = ev.target.result;
+                    state.files[file.name] = { content, modified: false };
+                    ide.syncFileToPyodideFS(file.name, content);
+                    ide.switchFile(file.name);
+                    ide.printToTerminal(`Uploaded '${file.name}' to workspace.\n`, 'term-success');
+                };
+                reader.readAsText(file);
+                e.target.value = '';
+            },
+
+            loadTemplate: (tplKey) => {
+                if (tplKey === 'multifile_demo') {
+                    state.files['math_helper.py'] = {
+                        content: `# math_helper.py - Custom Module\ndef fibonacci(n):\n    seq = [0, 1]\n    for i in range(2, n):\n        seq.append(seq[-1] + seq[-2])\n    return seq[:n]\n\ndef circle_area(radius):\n    return 3.14159 * (radius ** 2)\n`,
+                        modified: false
+                    };
+                    state.files['main.py'] = {
+                        content: `# Importing from another file in our workspace!\nimport math_helper\n\nprint("🔗 Testing Multi-File Import in VS Code:")\nfib_nums = math_helper.fibonacci(10)\nprint("First 10 Fibonacci Numbers:", fib_nums)\n\narea = math_helper.circle_area(7)\nprint(f"Area of circle (r=7): {area:.2f}")\n`,
+                        modified: false
+                    };
+                    ide.syncFileToPyodideFS('math_helper.py', state.files['math_helper.py'].content);
+                    ide.syncFileToPyodideFS('main.py', state.files['main.py'].content);
+                    ide.switchFile('main.py');
+                    ide.printToTerminal("Loaded Multi-File Demo (main.py + math_helper.py). Click 'Run' to test!\n", "term-sys");
+                    return;
+                }
+
+                if (CODE_TEMPLATES[tplKey]) {
+                    const targetFile = `${tplKey}.py`;
+                    state.files[targetFile] = { content: CODE_TEMPLATES[tplKey], modified: false };
+                    ide.syncFileToPyodideFS(targetFile, CODE_TEMPLATES[tplKey]);
+                    ide.switchFile(targetFile);
+                    ide.printToTerminal(`Loaded template '${targetFile}'. Press Run to execute!\n`, 'term-sys');
+                }
+            },
+
+            renderSidebar: () => {
+                els.fileList.innerHTML = '';
+                Object.keys(state.files).sort().forEach(fn => {
+                    const div = document.createElement('div');
+                    div.className = `file-item group ${fn === state.activeFile ? 'active' : ''}`;
+                    div.onclick = () => ide.switchFile(fn);
+                    
+                    const iconClass = fn.endsWith('.py') ? 'fab fa-python text-[#3776AB]' : 'far fa-file-alt text-gray-400';
+                    div.innerHTML = `
+                        <i class="${iconClass} w-5 text-center"></i>
+                        <span class="flex-1 truncate ml-1.5">${fn}</span>
+                        ${state.files[fn].modified ? '<span class="text-vsc-blue text-[10px] mr-1">●</span>' : ''}
+                        <button class="opacity-0 group-hover:opacity-100 hover:text-vsc-error p-0.5 transition-opacity" onclick="ide.deleteFile('${fn}', event)" title="Delete File">
+                            <i class="fas fa-times text-[10px]"></i>
+                        </button>
+                    `;
+                    els.fileList.appendChild(div);
+                });
+            },
+
+            renderTabs: () => {
+                els.tabs.innerHTML = '';
+                Object.keys(state.files).forEach(fn => {
+                    const isMod = state.files[fn].modified;
+                    const div = document.createElement('div');
+                    div.className = `editor-tab ${fn === state.activeFile ? 'active' : ''}`;
+                    div.onclick = () => ide.switchFile(fn);
+                    
+                    div.innerHTML = `
+                        <i class="fab fa-python text-[#3776AB] text-xs"></i>
+                        <span class="truncate max-w-[120px]">${fn}</span>
+                        ${isMod ? '<span class="text-vsc-blue text-xs font-bold">●</span>' : ''}
+                        <span class="close-btn" onclick="ide.deleteFile('${fn}', event)" title="Delete File">
+                            <i class="fas fa-times text-[10px]"></i>
+                        </span>
+                    `;
+                    els.tabs.appendChild(div);
+                });
+            },
+
+            // Terminal & Shell Engine
+            setupTerminal: () => {
+                els.termInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        const val = els.termInput.value;
+                        els.termInput.value = '';
+                        
+                        // If waiting on Python's input() call
+                        if (state.awaitingInput) {
+                            const resolve = state.awaitingInput;
+                            state.awaitingInput = null;
+                            ide.printToTerminal(val + '\n', 'term-info');
+                            resolve(val);
+                            return;
+                        }
+
+                        if (val.trim()) {
+                            state.cmdHistory.push(val);
+                            state.cmdHistoryIdx = state.cmdHistory.length;
+                        }
+
+                        ide.printToTerminal(`user@vscode:~/workspace$ ${val}\n`, 'term-prompt');
+                        ide.handleShellCommand(val);
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        if (state.cmdHistoryIdx > 0) {
+                            state.cmdHistoryIdx--;
+                            els.termInput.value = state.cmdHistory[state.cmdHistoryIdx];
+                        }
+                    } else if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        if (state.cmdHistoryIdx < state.cmdHistory.length - 1) {
+                            state.cmdHistoryIdx++;
+                            els.termInput.value = state.cmdHistory[state.cmdHistoryIdx];
+                        } else {
+                            state.cmdHistoryIdx = state.cmdHistory.length;
+                            els.termInput.value = '';
+                        }
+                    }
+                });
+            },
+
+            focusTerminal: () => {
+                if (state.bottomTab === 'terminal') els.termInput.focus();
+            },
+
+            clearTerminal: () => {
+                els.termOutput.innerHTML = '';
+            },
+
+            printToTerminal: (text, type = 'normal') => {
+                if (text === undefined || text === null) return;
+                const span = document.createElement('span');
+                span.textContent = text;
+                if (type !== 'normal') span.className = type;
+                els.termOutput.appendChild(span);
+                els.termWrapper.scrollTop = els.termWrapper.scrollHeight;
+            },
+
+            requestTerminalInput: () => {
+                return new Promise((resolve) => {
+                    ide.switchBottomTab('terminal');
+                    state.awaitingInput = resolve;
+                    els.termPromptLabel.innerHTML = `<span class="text-vsc-warn">›</span>`;
+                    els.termInput.placeholder = "Enter input value and press Enter...";
+                    els.termInputCont.style.display = 'flex';
+                    els.termInput.focus();
+                });
+            },
+
+            resetTerminalPrompt: () => {
+                els.termPromptLabel.innerHTML = `user@vscode<span class="text-white">:</span><span class="term-path">~/workspace</span>$`;
+                els.termInput.placeholder = "Type help, pip install numpy, python main.py, or python code...";
+                els.termInputCont.style.display = 'flex';
+            },
+
+            // Full-featured Terminal Command Handler (pip, python, ls, cat, touch, rm, REPL)
+            handleShellCommand: async (cmdString) => {
+                const str = cmdString.trim();
+                if (!str) return;
+                
+                const args = str.split(/\s+/);
+                const cmd = args[0];
+
+                els.termInputCont.style.display = 'none';
+
+                try {
+                    if (cmd === 'help') {
+                        ide.printToTerminal(
+`Available VS Code Terminal Commands:
+  pip install <pkg>     Install packages from PyPI (e.g. pip install numpy pandas)
+  pip list / freeze     Show all installed Python packages and versions
+  pip show <pkg>        Check package status and version details
+  python <file.py>      Execute a workspace Python file
+  ls / dir              List all files in workspace
+  cat <file.py>         Display contents of a file
+  touch <file.py>       Create a new empty file
+  rm <file.py>          Delete a file from workspace
+  clear                 Clear terminal output
+  <python_expression>   Directly evaluate any Python 3 statement (REPL mode)\n`, 'term-info');
+                    }
+                    else if (cmd === 'clear' || cmd === 'cls') {
+                        ide.clearTerminal();
+                    }
+                    else if (cmd === 'ls' || cmd === 'dir') {
+                        ide.printToTerminal(Object.keys(state.files).join('    ') + '\n', 'term-info');
+                    }
+                    else if (cmd === 'pwd') {
+                        ide.printToTerminal('/home/user/workspace\n');
+                    }
+                    else if (cmd === 'cat') {
+                        const target = args[1];
+                        if (!target) ide.printToTerminal("cat: missing file operand\n", "term-error");
+                        else if (!state.files[target]) ide.printToTerminal(`cat: ${target}: No such file\n`, "term-error");
+                        else ide.printToTerminal(state.files[target].content + '\n');
+                    }
+                    else if (cmd === 'touch') {
+                        let target = args[1];
+                        if (!target) ide.printToTerminal("touch: missing file name\n", "term-error");
+                        else {
+                            if (!target.includes('.')) target += '.py';
+                            if (!state.files[target]) {
+                                state.files[target] = { content: `# ${target}\n`, modified: false };
+                                ide.syncFileToPyodideFS(target, state.files[target].content);
+                                ide.renderSidebar();
+                                ide.renderTabs();
+                            }
+                            ide.printToTerminal(`Created ${target}\n`, 'term-success');
+                        }
+                    }
+                    else if (cmd === 'rm') {
+                        const target = args[1];
+                        if (!target || !state.files[target]) {
+                            ide.printToTerminal(`rm: cannot remove '${target || ''}': No such file\n`, 'term-error');
+                        } else if (Object.keys(state.files).length <= 1) {
+                            ide.printToTerminal(`rm: cannot delete the last remaining file.\n`, 'term-error');
+                        } else {
+                            delete state.files[target];
+                            if (state.activeFile === target) ide.switchFile(Object.keys(state.files)[0]);
+                            else { ide.renderSidebar(); ide.renderTabs(); }
+                            ide.printToTerminal(`Removed ${target}\n`, 'term-sys');
+                        }
+                    }
+                    else if (cmd === 'pip' || cmd === 'pip3') {
+                        const sub = args[1];
+                        if (sub === 'install') {
+                            const pkgs = args.slice(2).filter(p => !p.startsWith('-'));
+                            if (pkgs.length === 0) {
+                                ide.printToTerminal("ERROR: You must give at least one requirement to install.\n", "term-error");
+                            } else {
+                                for (const p of pkgs) {
+                                    await ide.installPackage(p, false);
+                                }
+                            }
+                        } else if (sub === 'list' || sub === 'freeze') {
+                            if (state.pyodide) {
+                                const micropip = state.pyodide.pyimport("micropip");
+                                const pkgList = micropip.list().toJs();
+                                pkgList.forEach((v, k) => state.installedPackages.set(k.toLowerCase(), v));
+                            }
+                            if (sub === 'freeze') {
+                                if (state.installedPackages.size === 0) ide.printToTerminal("# No external packages installed\n", "term-sys");
+                                state.installedPackages.forEach((v, k) => ide.printToTerminal(`${k}==${v}\n`));
+                            } else {
+                                ide.printToTerminal("Package              Version\n-------------------- ----------\n", "term-info");
+                                ide.printToTerminal("pip                  24.0\nmicropip             0.6.0\n");
+                                state.installedPackages.forEach((v, k) => {
+                                    ide.printToTerminal(`${k.padEnd(20, ' ')} ${v}\n`);
+                                });
+                            }
+                            ide.refreshPackagesUI();
+                        } else if (sub === 'show') {
+                            const pkg = (args[2] || '').toLowerCase();
+                            if (!pkg) {
+                                ide.printToTerminal("WARNING: Please provide a package name for 'pip show'.\n", "term-error");
+                            } else if (state.installedPackages.has(pkg)) {
+                                ide.printToTerminal(`Name: ${pkg}\nVersion: ${state.installedPackages.get(pkg)}\nLocation: /lib/python3.11/site-packages\nInstaller: micropip (Pyodide WASM)\nStatus: Active & Ready to import\n`, 'term-info');
+                            } else {
+                                ide.printToTerminal(`WARNING: Package(s) not found: ${pkg}\n`, 'term-error');
+                            }
+                        } else if (sub === '--version' || sub === '-V') {
+                            ide.printToTerminal("pip 24.0 from /lib/python3.11/site-packages/pip (python 3.11)\n");
+                        } else {
+                            ide.printToTerminal(`Usage: pip [install <pkg> | list | freeze | show <pkg>]\n`, 'term-sys');
+                        }
+                    }
+                    else if (cmd === 'python' || cmd === 'python3' || cmd === 'py') {
+                        const flagOrFile = args[1];
+                        if (!flagOrFile || flagOrFile === '--version' || flagOrFile === '-V') {
+                            ide.printToTerminal("Python 3.11.3 (main, Pyodide WASM)\n");
+                        } else if (flagOrFile === '-m' && args[2] === 'pip') {
+                            await ide.handleShellCommand(args.slice(2).join(' '));
+                        } else if (state.files[flagOrFile]) {
+                            await ide.executeCode(state.files[flagOrFile].content, flagOrFile);
+                        } else {
+                            ide.printToTerminal(`python: can't open file '${flagOrFile}': [Errno 2] No such file or directory\n`, 'term-error');
+                        }
+                    }
+                    else {
+                        // Direct Python REPL Evaluation
+                        if (!state.pyodide) {
+                            ide.printToTerminal("Python engine is not ready yet.\n", "term-error");
+                        } else {
+                            await ide.autoDetectAndInstallImports(str);
+                            const result = await state.pyodide.runPythonAsync(str);
+                            if (result !== undefined && result !== null) {
+                                ide.printToTerminal(String(result) + '\n', 'term-info');
+                            }
+                            ide.inspectGlobals();
+                        }
+                    }
+                } catch (err) {
+                    ide.printToTerminal(err.toString() + '\n', 'term-error');
+                }
+
+                ide.resetTerminalPrompt();
+                ide.focusTerminal();
+            },
+
+            runCode: async () => {
+                if (state.isRunning || !state.pyodide || !state.activeFile) return;
+                ide.saveFile();
+                if (!state.terminalVisible) ide.toggleTerminal();
+                
+                ide.printToTerminal(`user@vscode:~/workspace$ python ${state.activeFile}\n`, 'term-prompt');
+                await ide.executeCode(editor.getValue(), state.activeFile);
+            },
+
+            executeCode: async (code, filename) => {
+                state.isRunning = true;
+                els.btnStop.disabled = false;
+                els.btnRun.classList.add('opacity-60', 'pointer-events-none');
+                els.engineStatus.innerHTML = `<i class="fas fa-cog fa-spin text-vsc-warn"></i> Running ${filename}...`;
+                els.termInputCont.style.display = 'none';
+
+                try {
+                    // Sync all files before running
+                    Object.keys(state.files).forEach(fn => {
+                        ide.syncFileToPyodideFS(fn, state.files[fn].content);
+                    });
+
+                    // Auto-install known data-science packages if imported
+                    await ide.autoDetectAndInstallImports(code);
+
+                    await state.pyodide.runPythonAsync(code);
+                    ide.inspectGlobals();
+                } catch (error) {
+                    ide.printToTerminal('\n' + error.toString() + '\n', 'term-error');
+                } finally {
+                    state.isRunning = false;
+                    els.btnStop.disabled = true;
+                    els.btnRun.classList.remove('opacity-60', 'pointer-events-none');
+                    els.engineStatus.innerHTML = `<i class="fas fa-check-circle text-vsc-success"></i> Python 3.11 Ready`;
+                    
+                    if (state.awaitingInput) {
+                        state.awaitingInput = null;
+                    }
+                    
+                    ide.resetTerminalPrompt();
+                    ide.focusTerminal();
+                }
+            },
+
+            stopExecution: () => {
+                if (state.isRunning) {
+                    if (state.awaitingInput) {
+                        state.awaitingInput("");
+                        state.awaitingInput = null;
+                    }
+                    state.isRunning = false;
+                    els.btnStop.disabled = true;
+                    els.btnRun.classList.remove('opacity-60', 'pointer-events-none');
+                    els.engineStatus.innerHTML = `<i class="fas fa-check-circle text-vsc-success"></i> Python 3.11 Ready`;
+                    ide.printToTerminal('\nKeyboardInterrupt: Execution stopped by user.\n', 'term-error');
+                    ide.resetTerminalPrompt();
+                    ide.focusTerminal();
+                }
+            },
+
+            // UI Layout & View Switchers
+            switchSidebarView: (view) => {
+                if (state.sidebarView === view && els.sidebar.style.width !== '0px') {
+                    // Collapse sidebar if clicking active icon
+                    els.sidebar.style.width = '0px';
+                    els.sidebar.style.borderRightWidth = '0px';
+                    document.querySelectorAll('.act-btn').forEach(b => b.classList.remove('active'));
+                    setTimeout(() => editor.refresh(), 150);
+                    return;
+                }
+
+                state.sidebarView = view;
+                els.sidebar.style.width = '256px';
+                els.sidebar.style.borderRightWidth = '1px';
+
+                ['explorer', 'packages', 'snippets'].forEach(v => {
+                    document.getElementById(`view-${v}`).classList.toggle('hidden', v !== view);
+                    document.getElementById(`view-${v}`).classList.toggle('flex', v === view);
+                    document.getElementById(`act-${v}`).classList.toggle('active', v === view);
+                });
+
+                setTimeout(() => editor.refresh(), 150);
+            },
+
+            switchBottomTab: (tab) => {
+                state.bottomTab = tab;
+                ['terminal', 'plots', 'env'].forEach(t => {
+                    const btn = document.getElementById(`btab-${t}`);
+                    const view = document.getElementById(`bview-${t}`);
+                    if (t === tab) {
+                        btn.className = "h-full border-b-2 border-vsc-blue text-white font-medium uppercase tracking-wider text-[11px] flex items-center gap-1.5";
+                        view.classList.remove('hidden');
+                    } else {
+                        btn.className = "h-full border-b-2 border-transparent text-vsc-muted hover:text-white font-medium uppercase tracking-wider text-[11px] flex items-center gap-1.5";
+                        view.classList.add('hidden');
+                    }
+                });
+                if (tab === 'plots') document.getElementById('plot-badge').classList.add('hidden');
+                if (tab === 'env') ide.inspectGlobals();
+            },
+
+            toggleTerminal: () => {
+                state.terminalVisible = !state.terminalVisible;
+                els.panel.style.display = state.terminalVisible ? 'flex' : 'none';
+                document.getElementById('resizer-terminal').style.display = state.terminalVisible ? 'block' : 'none';
+                editor.refresh();
+            },
+
+            toggleMaximizeTerminal: () => {
+                state.terminalMaximized = !state.terminalMaximized;
+                const icon = document.getElementById('term-max-icon');
+                if (state.terminalMaximized) {
+                    els.panel.style.height = '75vh';
+                    icon.className = 'fas fa-chevron-down';
+                } else {
+                    els.panel.style.height = '256px';
+                    icon.className = 'fas fa-chevron-up';
+                }
+                editor.refresh();
+            },
+
+            formatCode: () => {
+                const lines = editor.getValue().split('\n').map(l => l.replace(/\s+$/, ''));
+                editor.setValue(lines.join('\n'));
+            },
+
+            copyCode: () => {
+                const text = editor.getValue();
+                const temp = document.createElement('textarea');
+                temp.value = text;
+                document.body.appendChild(temp);
+                temp.select();
+                document.execCommand('copy');
+                document.body.removeChild(temp);
+                const lbl = document.getElementById('copy-label');
+                lbl.textContent = 'Copied!';
+                setTimeout(() => lbl.textContent = 'Copy', 1500);
+            },
+
+            toggleFullscreen: () => {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(() => {});
+                } else if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            },
+
+            // Custom Modals (No Browser Alert/Prompt)
+            openModal: (type, data = {}) => {
+                els.modal.classList.remove('hidden');
+                els.modal.classList.add('flex');
+
+                if (type === 'newFile') {
+                    els.modalTitle.textContent = 'Create New Python File';
+                    els.modalBody.innerHTML = `
+                        <label class="block text-gray-400 mb-1">Enter file name (e.g. <code class="text-vsc-blue">helper.py</code>):</label>
+                        <input type="text" id="modal-file-input" value="script.py" class="w-full bg-vsc-bg border border-vsc-border focus:border-vsc-blue rounded px-3 py-2 text-white outline-none font-mono">
+                        <p id="modal-err" class="text-vsc-error text-[11px] hidden"></p>
+                    `;
+                    els.modalFooter.innerHTML = `
+                        <button onclick="ide.closeModal()" class="px-3 py-1.5 rounded bg-vsc-sidebar hover:bg-vsc-sidebarHover text-gray-300">Cancel</button>
+                        <button onclick="ide.confirmCreateFile()" class="px-3 py-1.5 rounded bg-vsc-blue hover:bg-vsc-blueHover text-white font-medium">Create File</button>
+                    `;
+                    setTimeout(() => {
+                        const inp = document.getElementById('modal-file-input');
+                        inp.focus();
+                        inp.select();
+                        inp.onkeydown = (e) => { if (e.key === 'Enter') ide.confirmCreateFile(); };
+                    }, 50);
+                }
+                else if (type === 'deleteFile') {
+                    els.modalTitle.textContent = 'Delete File';
+                    els.modalBody.innerHTML = `<p>Are you sure you want to permanently remove <strong class="text-white font-mono">${data.filename}</strong> from the workspace?</p>`;
+                    els.modalFooter.innerHTML = `
+                        <button onclick="ide.closeModal()" class="px-3 py-1.5 rounded bg-vsc-sidebar hover:bg-vsc-sidebarHover text-gray-300">Cancel</button>
+                        <button onclick="ide.confirmDeleteFile('${data.filename}')" class="px-3 py-1.5 rounded bg-vsc-error hover:opacity-90 text-white font-medium">Delete</button>
+                    `;
+                }
+                else if (type === 'resetProject') {
+                    els.modalTitle.textContent = 'Reset Workspace';
+                    els.modalBody.innerHTML = `<p>This will reset all files back to default starter code. Continue?</p>`;
+                    els.modalFooter.innerHTML = `
+                        <button onclick="ide.closeModal()" class="px-3 py-1.5 rounded bg-vsc-sidebar hover:bg-vsc-sidebarHover text-gray-300">Cancel</button>
+                        <button onclick="ide.confirmResetProject()" class="px-3 py-1.5 rounded bg-vsc-error text-white font-medium">Reset Everything</button>
+                    `;
+                }
+                else if (type === 'about') {
+                    els.modalTitle.textContent = 'VS Code Web - Python Pro System';
+                    els.modalBody.innerHTML = `
+                        <div class="space-y-2">
+                            <p class="text-white font-medium">Full In-Browser Python 3.11 IDE</p>
+                            <p class="text-vsc-muted">Powered by WebAssembly (Pyodide v0.25) and Micropip package manager.</p>
+                            <div class="bg-vsc-bg p-2.5 rounded border border-vsc-border font-mono text-[11px] space-y-1">
+                                <div>• Engine   : Python 3.11.3 WASM</div>
+                                <div>• Installer: pip / micropip PyPI</div>
+                                <div>• Graphics : Matplotlib Agg Canvas</div>
+                                <div>• FileSys  : Emscripten Virtual FS</div>
+                            </div>
+                        </div>
+                    `;
+                    els.modalFooter.innerHTML = `<button onclick="ide.closeModal()" class="px-4 py-1.5 rounded bg-vsc-blue text-white">Close</button>`;
+                }
+                else if (type === 'info') {
+                    els.modalTitle.textContent = data.title || 'Notice';
+                    els.modalBody.innerHTML = `<p>${data.message}</p>`;
+                    els.modalFooter.innerHTML = `<button onclick="ide.closeModal()" class="px-4 py-1.5 rounded bg-vsc-blue text-white">OK</button>`;
+                }
+            },
+
+            closeModal: () => {
+                els.modal.classList.add('hidden');
+                els.modal.classList.remove('flex');
+            },
+
+            confirmCreateFile: () => {
+                const inp = document.getElementById('modal-file-input');
+                const err = document.getElementById('modal-err');
+                let name = inp.value.trim();
+                if (!name) return;
+                if (!name.includes('.')) name += '.py';
+                if (state.files[name]) {
+                    err.textContent = 'File already exists in workspace!';
+                    err.classList.remove('hidden');
+                    return;
+                }
+                state.files[name] = { content: `# ${name}\n\n`, modified: false };
+                ide.syncFileToPyodideFS(name, state.files[name].content);
+                ide.switchFile(name);
+                ide.closeModal();
+            },
+
+            confirmDeleteFile: (filename) => {
+                delete state.files[filename];
+                if (state.activeFile === filename) {
+                    state.activeFile = Object.keys(state.files)[0];
+                }
+                ide.switchFile(state.activeFile);
+                ide.closeModal();
+            },
+
+            confirmResetProject: () => {
+                state.files = {
+                    'main.py': { content: CODE_TEMPLATES.default, modified: false }
+                };
+                ide.switchFile('main.py');
+                ide.clearTerminal();
+                ide.printToTerminal("Workspace reset to clean state.\n", "term-sys");
+                ide.closeModal();
+            },
+
+            // Command Palette (Ctrl+K)
+            openCommandPalette: () => {
+                els.cpModal.classList.remove('hidden');
+                els.cpModal.classList.add('flex');
+                els.cpInput.value = '';
+                ide.filterCommandPalette();
+                setTimeout(() => els.cpInput.focus(), 50);
+            },
+
+            closeCommandPalette: () => {
+                els.cpModal.classList.add('hidden');
+                els.cpModal.classList.remove('flex');
+            },
+
+            filterCommandPalette: () => {
+                const q = els.cpInput.value.trim().toLowerCase();
+                const commands = [
+                    { label: 'Run Active Python File', desc: 'Ctrl+Enter', icon: 'fa-play text-vsc-success', action: () => ide.runCode() },
+                    { label: 'Install Package: numpy', desc: 'pip install numpy', icon: 'fa-box text-vsc-blue', action: () => ide.installPackage('numpy') },
+                    { label: 'Install Package: pandas', desc: 'pip install pandas', icon: 'fa-box text-vsc-blue', action: () => ide.installPackage('pandas') },
+                    { label: 'Install Package: matplotlib', desc: 'pip install matplotlib', icon: 'fa-box text-vsc-blue', action: () => ide.installPackage('matplotlib') },
+                    { label: 'Install Package: scipy', desc: 'pip install scipy', icon: 'fa-box text-vsc-blue', action: () => ide.installPackage('scipy') },
+                    { label: 'Install Package: scikit-learn', desc: 'pip install scikit-learn', icon: 'fa-box text-vsc-blue', action: () => ide.installPackage('scikit-learn') },
+                    { label: 'Load Demo: NumPy Matrix Computing', desc: 'Template', icon: 'fa-flask text-purple-400', action: () => ide.loadTemplate('numpy_demo') },
+                    { label: 'Load Demo: Matplotlib Graph Plot', desc: 'Template', icon: 'fa-chart-line text-pink-400', action: () => ide.loadTemplate('plot_demo') },
+                    { label: 'Load Demo: Pandas DataFrame', desc: 'Template', icon: 'fa-table text-amber-400', action: () => ide.loadTemplate('pandas_demo') },
+                    { label: 'Create New File', desc: 'Workspace', icon: 'fa-file-plus text-gray-300', action: () => ide.openModal('newFile') },
+                    { label: 'Clear Terminal Output', desc: 'Ctrl+L', icon: 'fa-ban text-gray-400', action: () => ide.clearTerminal() }
+                ];
+
+                let filtered = commands.filter(c => c.label.toLowerCase().includes(q) || c.desc.toLowerCase().includes(q));
+
+                // Allow arbitrary pip install directly from Command Palette
+                if (q.startsWith('pip install ')) {
+                    const pkg = q.replace('pip install ', '').trim();
+                    if (pkg) {
+                        filtered.unshift({
+                            label: `Execute: pip install ${pkg}`,
+                            desc: 'PyPI Micropip',
+                            icon: 'fa-download text-vsc-warn',
+                            action: () => ide.installPackage(pkg)
+                        });
+                    }
+                } else if (q && filtered.length === 0) {
+                    filtered.push({
+                        label: `pip install ${q}`,
+                        desc: 'Install from PyPI',
+                        icon: 'fa-download text-vsc-blue',
+                        action: () => ide.installPackage(q)
+                    });
+                }
+
+                els.cpResults.innerHTML = '';
+                filtered.forEach(cmd => {
+                    const item = document.createElement('div');
+                    item.className = 'px-4 py-2.5 hover:bg-vsc-sidebarHover cursor-pointer flex items-center justify-between transition-colors';
+                    item.onclick = () => { ide.closeCommandPalette(); cmd.action(); };
+                    item.innerHTML = `
+                        <div class="flex items-center gap-2.5">
+                            <i class="fas ${cmd.icon} w-4 text-center"></i>
+                            <span class="text-gray-200">${cmd.label}</span>
+                        </div>
+                        <span class="text-[10px] text-vsc-muted font-mono bg-vsc-activity px-1.5 py-0.5 rounded">${cmd.desc}</span>
+                    `;
+                    els.cpResults.appendChild(item);
+                });
+            },
+
+            // Drag Resizers
+            setupResizers: () => {
+                const rSidebar = document.getElementById('resizer-sidebar');
+                let isRSidebar = false;
+                
+                rSidebar.addEventListener('mousedown', () => { isRSidebar = true; document.body.style.cursor = 'col-resize'; });
+                document.addEventListener('mousemove', (e) => {
+                    if (!isRSidebar) return;
+                    const newW = Math.max(180, Math.min(e.clientX - 48, 500));
+                    els.sidebar.style.width = `${newW}px`;
+                });
+                document.addEventListener('mouseup', () => {
+                    if (isRSidebar) { isRSidebar = false; document.body.style.cursor = 'default'; editor.refresh(); }
+                });
+
+                const rTerm = document.getElementById('resizer-terminal');
+                let isRTerm = false;
+
+                rTerm.addEventListener('mousedown', () => { isRTerm = true; document.body.style.cursor = 'row-resize'; });
+                document.addEventListener('mousemove', (e) => {
+                    if (!isRTerm) return;
+                    const totalH = document.body.clientHeight - 36 - 24;
+                    const newH = Math.max(100, Math.min(totalH - e.clientY + 36, totalH - 100));
+                    els.panel.style.height = `${newH}px`;
+                });
+                document.addEventListener('mouseup', () => {
+                    if (isRTerm) { isRTerm = false; document.body.style.cursor = 'default'; editor.refresh(); }
+                });
+            }
+        };
+
+        window.ide = ide;
+        window.addEventListener('DOMContentLoaded', ide.init);
+    </script>
+</body>
+</html>
